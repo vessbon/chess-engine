@@ -1,5 +1,8 @@
+from board.board import Board
+
+
 def main():
-    print("Hello from chess-engine!")
+    Board()
 
 
 if __name__ == "__main__":
