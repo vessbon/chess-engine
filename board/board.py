@@ -40,7 +40,7 @@ class Board:
 
         return [
             (move_row, move_col)
-            for move_row, move_col in piece.moves((row, col))
+            for move_row, move_col in piece.moves((row, col), self)
             if self.in_bounds(move_row, move_col)
         ]
 

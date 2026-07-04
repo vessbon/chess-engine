@@ -5,7 +5,7 @@ class Pawn(Piece):
     def symbol(self):
         return "P" if self.color == "white" else "p"
 
-    def moves(self, position):
+    def moves(self, position, board):
         row = position[0]
         col = position[1]
 
