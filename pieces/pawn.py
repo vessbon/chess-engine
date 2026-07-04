@@ -27,7 +27,7 @@ class Pawn(Piece):
         for dc in (1, -1):
             diagonal_step = (one_step[0], one_step[1] + dc)
             occupant = board.get(*diagonal_step)
-            if occupant:
+            if occupant and occupant.color != self.color:
                 moves.append(diagonal_step)
 
         # TODO: En passant
