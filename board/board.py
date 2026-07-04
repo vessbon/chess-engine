@@ -5,10 +5,10 @@ from pieces import Pawn, Piece
 
 
 class Board:
-    def __init__(self, size: int = 8) -> None:
-        self.size = size
+    def __init__(self) -> None:
+        self.size = 8
         self.grid: List[List[Optional[Piece]]] = [
-            [None for _ in range(8)] for _ in range(8)
+            [None for _ in range(self.size)] for _ in range(self.size)
         ]
 
     def setup(self) -> None:
