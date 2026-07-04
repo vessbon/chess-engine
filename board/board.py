@@ -23,7 +23,7 @@ class Board:
             for c in range(self.size):
                 self.grid[r][c] = None
 
-    def get(self, row: int, col: int) -> object:
+    def get(self, row: int, col: int) -> Optional[Piece]:
         self._validate_coords(row, col)
         return self.grid[row][col]
 
