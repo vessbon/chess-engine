@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from chess_types import Coordinate
 from pieces import Pawn, Piece
@@ -7,7 +7,7 @@ from pieces import Pawn, Piece
 class Board:
     def __init__(self, size: int = 8) -> None:
         self.size = size
-        self.grid: list[list[Optional[Piece]]] = [
+        self.grid: List[List[Optional[Piece]]] = [
             [None for _ in range(8)] for _ in range(8)
         ]
 
@@ -31,7 +31,7 @@ class Board:
         self._validate_coords(row, col)
         self.grid[row][col] = piece
 
-    def select(self, row: int, col: int) -> list[Coordinate]:
+    def select(self, row: int, col: int) -> List[Coordinate]:
         self._validate_coords(row, col)
         piece = self.grid[row][col]
 
