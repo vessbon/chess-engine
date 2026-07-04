@@ -1,4 +1,4 @@
-from .config import directions
+from .config import ALL_DIRECTIONS
 from .piece import Piece
 
 
@@ -11,7 +11,7 @@ class Queen(Piece):
 
         moves = []
 
-        for dr, dc in directions:
+        for dr, dc in ALL_DIRECTIONS:
             next_row = row + dr
             next_col = col + dc
 

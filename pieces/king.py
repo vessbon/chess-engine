@@ -1,4 +1,4 @@
-from .config import directions
+from .config import ALL_DIRECTIONS
 from .piece import Piece
 
 
@@ -11,7 +11,7 @@ class King(Piece):
 
         moves = []
 
-        for direction in directions:
+        for direction in ALL_DIRECTIONS:
             dr, dc = direction
             move = (row + dr, col + dc)
 
