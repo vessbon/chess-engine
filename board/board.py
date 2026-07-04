@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List, Optional
 
 from chess_types import Coordinate
 from pieces import Pawn, Piece
@@ -38,7 +38,11 @@ class Board:
         if piece is None:
             return []
 
-        return piece.moves((row, col), self.grid)
+        return [
+            (move_row, move_col)
+            for move_row, move_col in piece.moves((row, col))
+            if self.in_bounds(move_row, move_col)
+        ]
 
     def is_empty(self, row: int, col: int) -> bool:
         self._validate_coords(row, col)
