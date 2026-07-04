@@ -1,3 +1,4 @@
+from .config import directions
 from .piece import Piece
 
 
@@ -9,16 +10,6 @@ class King(Piece):
         row, col = position
 
         moves = []
-        directions = [
-            (-1, -1),
-            (-1, 0),
-            (-1, 1),
-            (0, -1),
-            (0, 1),
-            (1, -1),
-            (1, 0),
-            (1, 1),
-        ]
 
         for direction in directions:
             dr, dc = direction
