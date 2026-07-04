@@ -2,11 +2,16 @@ from .piece import Piece
 
 
 class Pawn(Piece):
-    def __init__(self, color) -> None:
-        super().__init__(color)
-
     def symbol(self):
         return "P" if self.color == "white" else "p"
 
-    def moves(self, position, board):
-        return [(1, 2)]
+    def moves(self, position):
+        row = position[0]
+        col = position[1]
+
+        if self.color == "white":
+            move_distance = 2 if row == 6 else 1
+            return [(row - move_distance, col)]
+        else:
+            move_distance = 2 if row == 1 else 1
+            return [(row + move_distance, col)]
