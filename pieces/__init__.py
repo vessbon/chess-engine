@@ -1,4 +1,5 @@
+from .king import King
 from .pawn import Pawn
 from .piece import Piece
 
-__all__ = ["Piece", "Pawn"]
+__all__ = ["Piece", "Pawn", "King"]
