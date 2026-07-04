@@ -1,5 +1,6 @@
 from typing import Optional
 
+from chess_types import Coordinate
 from pieces import Pawn, Piece
 
 
@@ -30,6 +31,15 @@ class Board:
         self._validate_coords(row, col)
         self.grid[row][col] = piece
 
+    def select(self, row: int, col: int) -> list[Coordinate]:
+        self._validate_coords(row, col)
+        piece = self.grid[row][col]
+
+        if piece is None:
+            return []
+
+        return piece.moves((row, col), self.grid)
+
     def is_empty(self, row: int, col: int) -> bool:
         self._validate_coords(row, col)
         return self.grid[row][col] is None
@@ -56,20 +66,3 @@ class Board:
             rows.append(" ".join(row))
 
         return "\n".join(rows)
-
-
-board = Board()
-print(f"\n{board}")
-
-print("\n------------------------------\n")
-
-print(board.get(1, 1))
-board.set(1, 1, Pawn(color="white"))
-print(board.get(1, 1))
-
-print("\n------------------------------\nSetting up...\nFinished:\n")
-
-board.setup()
-print(board)
-
-print("\n------------------------------\n")
