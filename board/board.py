@@ -51,21 +51,21 @@ class Board:
         if piece is None:
             return False
 
-        legal_moves = self.select(from_row, from_col)
+        legal_moves = self.legal_moves(from_row, from_col)
         if (to_row, to_col) in legal_moves:
-            occupant = self.get(to_row, to_col)
+            target = self.get(to_row, to_col)
             self.set(from_row, from_col, None)
             self.set(to_row, to_col, piece)
 
             # TODO: Capture logic
-            if occupant and occupant.color != piece.color:
+            if target and target.color != piece.color:
                 pass
 
             return True
 
         return False
 
-    def select(self, row: int, col: int) -> list[Coordinate]:
+    def legal_moves(self, row: int, col: int) -> list[Coordinate]:
         self._validate_coords(row, col)
         piece = self.grid[row][col]
 
