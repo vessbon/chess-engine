@@ -19,16 +19,22 @@ class Pawn(Piece):
         one_step = (row + direction, col)
 
         # Normal movement
-        if board.is_empty(*one_step):
+        if board.in_bounds(*one_step) and board.is_empty(*one_step):
             moves.append(one_step)
 
             two_steps = (row + direction * 2, col)
-            if row == start_row and board.is_empty(*two_steps):
+            if (
+                row == start_row
+                and board.in_bounds(*two_steps)
+                and board.is_empty(*two_steps)
+            ):
                 moves.append(two_steps)
 
         # Capture movement
         for dc in (1, -1):
             diagonal_step = (one_step[0], one_step[1] + dc)
+            if not board.in_bounds(*diagonal_step):
+                continue
             occupant = board.get(*diagonal_step)
             if occupant and occupant.color != self.color:
                 moves.append(diagonal_step)
