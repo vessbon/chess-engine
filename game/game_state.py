@@ -42,7 +42,16 @@ class GameState:
         if self.current_color == Color.WHITE:
             self.current_color = Color.BLACK
         else:
-            self.current_color = "white"
+            self.current_color = Color.WHITE
+
+    def mark_en_passant(self, square: Coordinate):
+        self.en_passant_square = square
+
+    def clear_en_passant(self):
+        self.en_passant_square = None
+
+    def revoke_castling(self, color: Color, side: CastlingSide) -> None:
+        setattr(self.castling[color], side, False)
 
     def record_capture(self, captured_piece: Piece):
         self._give_points(self.current_color, int(captured_piece.VALUE))
