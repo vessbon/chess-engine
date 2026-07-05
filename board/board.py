@@ -1,6 +1,6 @@
 from typing import Optional
 
-from chess_types import Coordinate
+from chess_types import Color, Coordinate
 from pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
 
 
@@ -26,12 +26,12 @@ class Board:
         ]
 
         for i in range(self.size):
-            self.set(1, i, Pawn(color="black"))
-            self.set(6, i, Pawn(color="white"))
+            self.set(1, i, Pawn(Color.BLACK))
+            self.set(6, i, Pawn(Color.WHITE))
 
         for i, piece in enumerate(back_rank):
-            self.set(0, i, piece(color="black"))
-            self.set(7, i, piece(color="white"))
+            self.set(0, i, piece(Color.BLACK))
+            self.set(7, i, piece(Color.WHITE))
 
     def reset(self) -> None:
         for r in range(self.size):
