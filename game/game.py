@@ -20,6 +20,13 @@ class Game:
 
         moved = self.board.move(from_row, from_col, to_row, to_col)
         if moved:
+
+            # En passant logic
+            self.state.clear_en_passant()
+            if isinstance(piece, Pawn) and abs(to_row - from_row) == 2:
+                passed_row = (from_row + to_row) // 2
+                self.state.mark_en_passant((passed_row, from_col))
+
             # Capture logic
             if target is not None and target.color != piece.color:
                 self.state.record_capture(target)
