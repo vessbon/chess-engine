@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from chess_types import Coordinate
 from pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
@@ -72,11 +72,20 @@ class Board:
         if piece is None:
             return []
 
-        return [
-            (move_row, move_col)
-            for move_row, move_col in piece.moves((row, col), self)
-            if self.in_bounds(move_row, move_col)
-        ]
+        moves = []
+
+        for move_row, move_col in piece.moves((row, col), self):
+            if not self.in_bounds(move_row, move_col):
+                continue
+
+            occupant = self.get(move_row, move_col)
+
+            if isinstance(occupant, King):
+                continue
+
+            moves.append((move_row, move_col))
+
+        return moves
 
     def is_empty(self, row: int, col: int) -> bool:
         self._validate_coords(row, col)
