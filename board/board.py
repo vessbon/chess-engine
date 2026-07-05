@@ -80,7 +80,7 @@ class Board:
                 if piece is None:
                     row.append(".")
                 else:
-                    row.append(piece.symbol())
+                    row.append(piece.symbol)
 
             rows.append(" ".join(row))
 
