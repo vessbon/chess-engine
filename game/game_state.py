@@ -1,4 +1,5 @@
 from chess_types import Color
+from pieces import Piece
 
 
 class GameState:
@@ -24,11 +25,11 @@ class GameState:
         else:
             self.current_color = "white"
 
-    def give_points(self, color: Color, value: int) -> None:
-        if color == "white":
-            self.white_points += value
+    def record_capture(self, captured_piece: Piece):
+        if captured_piece.color == "white":
+            self.black_points += captured_piece.VALUE
         else:
-            self.black_points += value
+            self.white_points += captured_piece.VALUE
 
     def __str__(self) -> str:
         return (
