@@ -7,14 +7,14 @@ from pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
 class Board:
     def __init__(self) -> None:
         self.size = 8
-        self.grid: List[List[Optional[Piece]]] = [
+        self.grid: list[list[Optional[Piece]]] = [
             [None for _ in range(self.size)] for _ in range(self.size)
         ]
 
     def setup(self) -> None:
         self.reset()
 
-        back_rank: List[type[Piece]] = [
+        back_rank: list[type[Piece]] = [
             Rook,
             Knight,
             Bishop,
@@ -65,7 +65,7 @@ class Board:
 
         return False
 
-    def select(self, row: int, col: int) -> List[Coordinate]:
+    def select(self, row: int, col: int) -> list[Coordinate]:
         self._validate_coords(row, col)
         piece = self.grid[row][col]
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, ClassVar, List
+from typing import TYPE_CHECKING, ClassVar
 
 from chess_types import Color, Coordinate
 
@@ -29,12 +29,12 @@ class Piece(ABC):
         pass
 
     @abstractmethod
-    def moves(self, position: Coordinate, board: Board) -> List[Coordinate]:
+    def moves(self, position: Coordinate, board: Board) -> list[Coordinate]:
         pass
 
     def _sliding_moves(
         self, position: Coordinate, board: Board, directions
-    ) -> List[Coordinate]:
+    ) -> list[Coordinate]:
         row, col = position
         moves = []
 
