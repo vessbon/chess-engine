@@ -8,7 +8,7 @@ class GameState:
         castling_enabled: bool = True,
         start_time: float = 600_000,
     ) -> None:
-        self.white_to_move = white_start
+        self.current_color: Color = "white" if white_start else "black"
 
         self.time_left = start_time  # ms
 
@@ -29,7 +29,7 @@ class GameState:
 
     def __str__(self) -> str:
         return (
-            f"{'white' if self.white_to_move else 'black'} to move\n"
+            f"{self.current_color} to move\n"
             f"{self.time_left / 1000} seconds left\n"
             f"white can{'' if self.white_castling_rights else 'not'} castle\n"
             f"black can{'' if self.black_castling_rights else 'not'} castle\n"
