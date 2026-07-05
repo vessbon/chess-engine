@@ -27,7 +27,7 @@ class GameState:
 
         self.castling: dict[Color, CastlingRights] = {
             Color.WHITE: CastlingRights(castling_enabled, castling_enabled),
-            Color.BLACK: CastlingRights(),
+            Color.BLACK: CastlingRights(castling_enabled, castling_enabled),
         }
 
         self.white_captures: list[Piece] = []
