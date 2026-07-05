@@ -13,7 +13,7 @@ class Game:
 
     def move(self, from_row: int, from_col: int, to_row: int, to_col: int) -> None:
         piece = self.board.get(from_row, from_col)
-        if piece is None:
+        if piece is None or piece.color != self.state.current_color:
             return
 
         target = self.board.get(to_row, to_col)
