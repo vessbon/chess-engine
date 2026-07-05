@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from chess_types import Coordinate
-from pieces import Pawn, Piece
+from pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
 
 
 class Board:
@@ -14,9 +14,24 @@ class Board:
     def setup(self) -> None:
         self.reset()
 
+        back_rank: List[type[Piece]] = [
+            Rook,
+            Knight,
+            Bishop,
+            Queen,
+            King,
+            Bishop,
+            Knight,
+            Rook,
+        ]
+
         for i in range(self.size):
             self.set(1, i, Pawn(color="black"))
             self.set(6, i, Pawn(color="white"))
+
+        for i, piece in enumerate(back_rank):
+            self.set(0, i, piece(color="black"))
+            self.set(7, i, piece(color="white"))
 
     def reset(self) -> None:
         for r in range(self.size):
@@ -27,9 +42,28 @@ class Board:
         self._validate_coords(row, col)
         return self.grid[row][col]
 
-    def set(self, row: int, col: int, piece: Piece) -> None:
+    def set(self, row: int, col: int, piece: Optional[Piece]) -> None:
         self._validate_coords(row, col)
         self.grid[row][col] = piece
+
+    def move(self, from_row: int, from_col: int, to_row: int, to_col: int) -> bool:
+        piece = self.get(from_row, from_col)
+        if piece is None:
+            return False
+
+        legal_moves = self.select(from_row, from_col)
+        if (to_row, to_col) in legal_moves:
+            occupant = self.get(to_row, to_col)
+            self.set(from_row, from_col, None)
+            self.set(to_row, to_col, piece)
+
+            # TODO: Capture logic
+            if occupant and occupant.color != piece.color:
+                pass
+
+            return True
+
+        return False
 
     def select(self, row: int, col: int) -> List[Coordinate]:
         self._validate_coords(row, col)
@@ -65,7 +99,7 @@ class Board:
                 if piece is None:
                     row.append(".")
                 else:
-                    row.append(piece.symbol())
+                    row.append(piece.symbol)
 
             rows.append(" ".join(row))
 

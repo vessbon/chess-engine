@@ -2,13 +2,16 @@ from .piece import Piece
 
 
 class Knight(Piece):
+    VALUE = 3
+
+    @property
     def symbol(self):
         return "N" if self.color == "white" else "n"
 
     def moves(self, position, board):
         row, col = position
 
-        OFFSETS = (
+        offsets = (
             (2, -1),
             (2, 1),
             (-2, -1),
@@ -21,7 +24,7 @@ class Knight(Piece):
 
         moves = []
 
-        for offset in OFFSETS:
+        for offset in offsets:
             dr, dc = offset
 
             move = (row + dr, col + dc)

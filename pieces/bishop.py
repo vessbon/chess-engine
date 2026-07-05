@@ -3,6 +3,9 @@ from .piece import Piece
 
 
 class Bishop(Piece):
+    VALUE = 3
+
+    @property
     def symbol(self):
         return "B" if self.color == "white" else "b"
 

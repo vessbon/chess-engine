@@ -2,6 +2,9 @@ from .piece import Piece
 
 
 class Pawn(Piece):
+    VALUE = 1
+
+    @property
     def symbol(self):
         return "P" if self.color == "white" else "p"
 
