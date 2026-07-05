@@ -21,7 +21,7 @@ class GameState:
         castling_enabled: bool = True,
         start_time: float = 600_000,
     ) -> None:
-        self.current_color: Color = "white" if white_start else "black"
+        self.current_color: Color = Color.WHITE if white_start else Color.BLACK
 
         self.time_left: float = start_time  # ms
 
@@ -37,20 +37,20 @@ class GameState:
         self.en_passant_square: Optional[Coordinate] = None
 
     def toggle_moving_color(self) -> None:
-        if self.current_color == "white":
-            self.current_color = "black"
+        if self.current_color == Color.WHITE:
+            self.current_color = Color.BLACK
         else:
             self.current_color = "white"
 
     def record_capture(self, captured_piece: Piece):
-        self.give_points(self.current_color, int(captured_piece.VALUE))
-        if self.current_color == "white":
+        self._give_points(self.current_color, int(captured_piece.VALUE))
+        if self.current_color == Color.WHITE:
             self.white_captures.append(captured_piece)
         else:
             self.black_captures.append(captured_piece)
 
-    def give_points(self, color: Color, value: int):
-        if color == "white":
+    def _give_points(self, color: Color, value: int):
+        if color == Color.WHITE:
             self.white_points += value
         else:
             self.black_points += value
