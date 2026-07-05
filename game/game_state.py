@@ -40,5 +40,6 @@ class GameState:
             f"{self.time_left / 1000} seconds left\n"
             f"white can{'' if self.white_castling_rights else 'not'} castle\n"
             f"black can{'' if self.black_castling_rights else 'not'} castle\n"
-            f"white points: {self.white_points}\nblack points: {self.black_points}"
+            f"white points: {self.white_points}\nwhite captures: {self.white_captures}\n"
+            f"black points: {self.black_points}\nblack captures: {self.black_captures}"
         )
