@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, ClassVar, List
 
 from chess_types import Color, Coordinate
 
@@ -10,9 +10,20 @@ if TYPE_CHECKING:
 
 
 class Piece(ABC):
+    VALUE: ClassVar[int | float]
+
     def __init__(self, color: Color) -> None:
         self.color: Color = color
 
+    def __init_subclass__(cls, **kwargs) -> None:
+        super().__init_subclass__(**kwargs)
+
+        if "VALUE" not in cls.__dict__:
+            raise TypeError(
+                f"Class {cls.__name__} must define a 'VALUE' class attribute."
+            )
+
+    @property
     @abstractmethod
     def symbol(self) -> str:
         pass
@@ -49,4 +60,4 @@ class Piece(ABC):
         return moves
 
     def __str__(self) -> str:
-        return self.symbol()
+        return self.symbol
