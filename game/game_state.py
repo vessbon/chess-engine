@@ -68,10 +68,10 @@ class GameState:
 
     def __str__(self) -> str:
         white_castling_rights = (
-            self.castling[Color.WHITE].kingside and self.castling[Color.WHITE].queenside
+            self.castling[Color.WHITE].kingside or self.castling[Color.WHITE].queenside
         )
         black_castling_rights = (
-            self.castling[Color.BLACK].kingside and self.castling[Color.BLACK].queenside
+            self.castling[Color.BLACK].kingside or self.castling[Color.BLACK].queenside
         )
 
         return (
