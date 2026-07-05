@@ -1,3 +1,5 @@
+from chess_types import Color
+
 from .piece import Piece
 
 
@@ -6,13 +8,13 @@ class Pawn(Piece):
 
     @property
     def symbol(self):
-        return "P" if self.color == "white" else "p"
+        return "P" if self.color == Color.WHITE else "p"
 
     def moves(self, position, board):
         row, col = position
 
-        direction = -1 if self.color == "white" else 1
-        start_row = 6 if self.color == "white" else 1
+        direction = -1 if self.color == Color.WHITE else 1
+        start_row = 6 if self.color == Color.WHITE else 1
 
         moves = []
 

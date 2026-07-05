@@ -1,3 +1,5 @@
+from chess_types import Color
+
 from .piece import Piece
 
 
@@ -6,7 +8,7 @@ class Knight(Piece):
 
     @property
     def symbol(self):
-        return "N" if self.color == "white" else "n"
+        return "N" if self.color == Color.WHITE else "n"
 
     def moves(self, position, board):
         offsets = (
