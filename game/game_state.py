@@ -75,7 +75,7 @@ class GameState:
         )
 
         return (
-            f"{self.current_color} to move\n"
+            f"{self.current_color.value} to move\n"
             f"{self.time_left / 1000} seconds left\n"
             f"white can{'' if white_castling_rights else 'not'} castle\n"
             f"black can{'' if black_castling_rights else 'not'} castle\n"
