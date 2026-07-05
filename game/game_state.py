@@ -1,7 +1,17 @@
-from typing import Optional
+from dataclasses import dataclass
+from typing import Literal, Optional
 
 from chess_types import Color, Coordinate
 from pieces import Piece
+
+
+@dataclass
+class CastlingRights:
+    kingside: bool = True
+    queenside: bool = True
+
+
+type CastlingSide = Literal["kingside", "queenside"]
 
 
 class GameState:
