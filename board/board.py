@@ -42,9 +42,28 @@ class Board:
         self._validate_coords(row, col)
         return self.grid[row][col]
 
-    def set(self, row: int, col: int, piece: Piece) -> None:
+    def set(self, row: int, col: int, piece: Optional[Piece]) -> None:
         self._validate_coords(row, col)
         self.grid[row][col] = piece
+
+    def move(self, from_row: int, from_col: int, to_row: int, to_col: int) -> bool:
+        piece = self.get(from_row, from_col)
+        if piece is None:
+            return False
+
+        legal_moves = self.select(from_row, from_col)
+        if (to_row, to_col) in legal_moves:
+            occupant = self.get(to_row, to_col)
+            self.set(from_row, from_col, None)
+            self.set(to_row, to_col, piece)
+
+            # TODO: Capture logic
+            if occupant and occupant.color != piece.color:
+                pass
+
+            return True
+
+        return False
 
     def select(self, row: int, col: int) -> List[Coordinate]:
         self._validate_coords(row, col)
