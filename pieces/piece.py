@@ -59,5 +59,28 @@ class Piece(ABC):
 
         return moves
 
+    def _stepping_moves(
+        self, position: Coordinate, board: Board, offsets
+    ) -> list[Coordinate]:
+        row, col = position
+        moves = []
+
+        for offset in offsets:
+            dr, dc = offset
+
+            move = (row + dr, col + dc)
+
+            if not board.in_bounds(*move):
+                continue
+
+            occupant = board.get(*move)
+
+            if occupant and occupant.color == self.color:
+                continue
+
+            moves.append(move)
+
+        return moves
+
     def __str__(self) -> str:
         return self.symbol
