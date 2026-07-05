@@ -82,5 +82,8 @@ class Piece(ABC):
 
         return moves
 
+    def __repr__(self):
+        return self.symbol
+
     def __str__(self) -> str:
         return self.symbol
