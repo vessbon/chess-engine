@@ -2,6 +2,9 @@ from .piece import Piece
 
 
 class Knight(Piece):
+    VALUE = 3
+
+    @property
     def symbol(self):
         return "N" if self.color == "white" else "n"
 

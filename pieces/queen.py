@@ -3,6 +3,9 @@ from .piece import Piece
 
 
 class Queen(Piece):
+    VALUE = 9
+
+    @property
     def symbol(self):
         return "Q" if self.color == "white" else "q"
 

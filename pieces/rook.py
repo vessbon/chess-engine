@@ -3,6 +3,9 @@ from .piece import Piece
 
 
 class Rook(Piece):
+    VALUE = 5
+
+    @property
     def symbol(self):
         return "R" if self.color == "white" else "r"
 
