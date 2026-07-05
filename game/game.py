@@ -1,4 +1,5 @@
 from board import Board
+from pieces import King, Pawn, Rook
 
 from .game_state import GameState
 
@@ -20,6 +21,16 @@ class Game:
 
         moved = self.board.move(from_row, from_col, to_row, to_col)
         if moved:
+            # Castling logic
+            if isinstance(piece, King):
+                self.state.revoke_castling(self.state.current_color, "queenside")
+                self.state.revoke_castling(self.state.current_color, "kingside")
+
+            if isinstance(piece, Rook):
+                if from_col == 0:
+                    self.state.revoke_castling(self.state.current_color, "queenside")
+                elif from_col == 7:
+                    self.state.revoke_castling(self.state.current_color, "kingside")
 
             # En passant logic
             self.state.clear_en_passant()
