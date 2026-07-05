@@ -53,14 +53,8 @@ class Board:
 
         legal_moves = self.legal_moves(from_row, from_col)
         if (to_row, to_col) in legal_moves:
-            target = self.get(to_row, to_col)
             self.set(from_row, from_col, None)
             self.set(to_row, to_col, piece)
-
-            # TODO: Capture logic
-            if target and target.color != piece.color:
-                pass
-
             return True
 
         return False
