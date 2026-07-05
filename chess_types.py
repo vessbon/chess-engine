@@ -1,4 +1,9 @@
-from typing import Literal
+from enum import Enum
 
-type Color = Literal["white", "black"]
+
+class Color(Enum):
+    WHITE = "white"
+    BLACK = "black"
+
+
 type Coordinate = tuple[int, int]
