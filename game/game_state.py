@@ -18,8 +18,11 @@ class GameState:
         self.white_points = 0
         self.black_points = 0
 
-    def switch_moving_color(self) -> None:
-        self.white_to_move = not self.white_to_move
+    def toggle_moving_color(self) -> None:
+        if self.current_color == "white":
+            self.current_color = "black"
+        else:
+            self.current_color = "white"
 
     def give_points(self, color: Color, value: int) -> None:
         if color == "white":
