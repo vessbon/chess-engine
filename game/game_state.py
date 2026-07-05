@@ -1,4 +1,6 @@
-from chess_types import Color
+from typing import Optional
+
+from chess_types import Color, Coordinate
 from pieces import Piece
 
 
@@ -21,6 +23,8 @@ class GameState:
 
         self.white_points: int = 0
         self.black_points: int = 0
+
+        self.en_passant_square: Optional[Coordinate] = None
 
     def toggle_moving_color(self) -> None:
         if self.current_color == "white":
@@ -47,6 +51,7 @@ class GameState:
             f"{self.time_left / 1000} seconds left\n"
             f"white can{'' if self.white_castling_rights else 'not'} castle\n"
             f"black can{'' if self.black_castling_rights else 'not'} castle\n"
+            f"en passant {'square at: ' + str(self.en_passant_square) if self.en_passant_square else 'not available'}\n"
             f"white points: {self.white_points}\nwhite captures: {self.white_captures}\n"
             f"black points: {self.black_points}\nblack captures: {self.black_captures}"
         )
