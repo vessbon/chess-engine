@@ -11,13 +11,16 @@ class GameState:
     ) -> None:
         self.current_color: Color = "white" if white_start else "black"
 
-        self.time_left = start_time  # ms
+        self.time_left: float = start_time  # ms
 
-        self.white_castling_rights = castling_enabled
-        self.black_castling_rights = castling_enabled
+        self.white_castling_rights: bool = castling_enabled
+        self.black_castling_rights: bool = castling_enabled
 
-        self.white_points = 0
-        self.black_points = 0
+        self.white_captures: list[Piece] = []
+        self.black_captures: list[Piece] = []
+
+        self.white_points: int = 0
+        self.black_points: int = 0
 
     def toggle_moving_color(self) -> None:
         if self.current_color == "white":
