@@ -1,4 +1,4 @@
-from typing import Literal, Tuple
+from typing import Literal
 
 type Color = Literal["white", "black"]
-type Coordinate = Tuple[int, int]
+type Coordinate = tuple[int, int]

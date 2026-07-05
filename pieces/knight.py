@@ -9,8 +9,6 @@ class Knight(Piece):
         return "N" if self.color == "white" else "n"
 
     def moves(self, position, board):
-        row, col = position
-
         offsets = (
             (2, -1),
             (2, 1),
@@ -22,17 +20,4 @@ class Knight(Piece):
             (-1, -2),
         )
 
-        moves = []
-
-        for offset in offsets:
-            dr, dc = offset
-
-            move = (row + dr, col + dc)
-            occupant = board.get(*move)
-
-            if occupant and occupant.color == self.color:
-                continue
-
-            moves.append((row + dr, col + dc))
-
-        return moves
+        return self._stepping_moves(position, board, offsets)

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, ClassVar, List
+from typing import TYPE_CHECKING, ClassVar
 
 from chess_types import Color, Coordinate
 
@@ -29,12 +29,12 @@ class Piece(ABC):
         pass
 
     @abstractmethod
-    def moves(self, position: Coordinate, board: Board) -> List[Coordinate]:
+    def moves(self, position: Coordinate, board: Board) -> list[Coordinate]:
         pass
 
     def _sliding_moves(
         self, position: Coordinate, board: Board, directions
-    ) -> List[Coordinate]:
+    ) -> list[Coordinate]:
         row, col = position
         moves = []
 
@@ -56,6 +56,29 @@ class Piece(ABC):
 
                 next_row += dr
                 next_col += dc
+
+        return moves
+
+    def _stepping_moves(
+        self, position: Coordinate, board: Board, offsets
+    ) -> list[Coordinate]:
+        row, col = position
+        moves = []
+
+        for offset in offsets:
+            dr, dc = offset
+
+            move = (row + dr, col + dc)
+
+            if not board.in_bounds(*move):
+                continue
+
+            occupant = board.get(*move)
+
+            if occupant and occupant.color == self.color:
+                continue
+
+            moves.append(move)
 
         return moves
 

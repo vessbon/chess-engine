@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from chess_types import Coordinate
 from pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
@@ -7,14 +7,14 @@ from pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
 class Board:
     def __init__(self) -> None:
         self.size = 8
-        self.grid: List[List[Optional[Piece]]] = [
+        self.grid: list[list[Optional[Piece]]] = [
             [None for _ in range(self.size)] for _ in range(self.size)
         ]
 
     def setup(self) -> None:
         self.reset()
 
-        back_rank: List[type[Piece]] = [
+        back_rank: list[type[Piece]] = [
             Rook,
             Knight,
             Bishop,
@@ -51,32 +51,41 @@ class Board:
         if piece is None:
             return False
 
-        legal_moves = self.select(from_row, from_col)
+        legal_moves = self.legal_moves(from_row, from_col)
         if (to_row, to_col) in legal_moves:
-            occupant = self.get(to_row, to_col)
+            target = self.get(to_row, to_col)
             self.set(from_row, from_col, None)
             self.set(to_row, to_col, piece)
 
             # TODO: Capture logic
-            if occupant and occupant.color != piece.color:
+            if target and target.color != piece.color:
                 pass
 
             return True
 
         return False
 
-    def select(self, row: int, col: int) -> List[Coordinate]:
+    def legal_moves(self, row: int, col: int) -> list[Coordinate]:
         self._validate_coords(row, col)
         piece = self.grid[row][col]
 
         if piece is None:
             return []
 
-        return [
-            (move_row, move_col)
-            for move_row, move_col in piece.moves((row, col), self)
-            if self.in_bounds(move_row, move_col)
-        ]
+        moves = []
+
+        for move_row, move_col in piece.moves((row, col), self):
+            if not self.in_bounds(move_row, move_col):
+                continue
+
+            occupant = self.get(move_row, move_col)
+
+            if isinstance(occupant, King):
+                continue
+
+            moves.append((move_row, move_col))
+
+        return moves
 
     def is_empty(self, row: int, col: int) -> bool:
         self._validate_coords(row, col)
