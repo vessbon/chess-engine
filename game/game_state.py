@@ -21,7 +21,7 @@ class GameState:
     def switch_moving_color(self) -> None:
         self.white_to_move = not self.white_to_move
 
-    def give_points(self, color: Color, value: int):
+    def give_points(self, color: Color, value: int) -> None:
         if color == "white":
             self.white_points += value
         else:
