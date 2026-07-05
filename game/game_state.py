@@ -25,8 +25,10 @@ class GameState:
 
         self.time_left: float = start_time  # ms
 
-        self.white_castling_rights: bool = castling_enabled
-        self.black_castling_rights: bool = castling_enabled
+        self.castling: dict[Color, CastlingRights] = {
+            Color.WHITE: CastlingRights(castling_enabled, castling_enabled),
+            Color.BLACK: CastlingRights(),
+        }
 
         self.white_captures: list[Piece] = []
         self.black_captures: list[Piece] = []
