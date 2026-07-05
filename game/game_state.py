@@ -29,10 +29,17 @@ class GameState:
             self.current_color = "white"
 
     def record_capture(self, captured_piece: Piece):
-        if captured_piece.color == "white":
-            self.black_points += captured_piece.VALUE
+        self.give_points(self.current_color, int(captured_piece.VALUE))
+        if self.current_color == "white":
+            self.white_captures.append(captured_piece)
         else:
-            self.white_points += captured_piece.VALUE
+            self.black_captures.append(captured_piece)
+
+    def give_points(self, color: Color, value: int):
+        if color == "white":
+            self.white_points += value
+        else:
+            self.black_points += value
 
     def __str__(self) -> str:
         return (
