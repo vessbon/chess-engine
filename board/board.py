@@ -51,15 +51,15 @@ class Board:
         if piece is None:
             return False
 
-        legal_moves = self.legal_moves(from_row, from_col)
-        if (to_row, to_col) in legal_moves:
+        pseudo_legal_moves = self.pseudo_moves(from_row, from_col)
+        if (to_row, to_col) in pseudo_legal_moves:
             self.set(from_row, from_col, None)
             self.set(to_row, to_col, piece)
             return True
 
         return False
 
-    def legal_moves(self, row: int, col: int) -> list[Coordinate]:
+    def pseudo_moves(self, row: int, col: int) -> list[Coordinate]:
         self._validate_coords(row, col)
         piece = self.grid[row][col]
 
