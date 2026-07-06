@@ -28,10 +28,33 @@ class Game:
             return
 
         target = self.board.get(to_row, to_col)
+        home_row = 7 if self.state.current_color == Color.WHITE else 0
 
-        moved = self.board.move(from_row, from_col, to_row, to_col)
-        if moved:
-            # Castling logic
+        moved = False
+        castled = False
+
+        # Castling logic
+        kingside = self.state.castling[self.state.current_color].kingside
+        queenside = self.state.castling[self.state.current_color].queenside
+
+        is_castle_attempt = (
+            isinstance(piece, King)
+            and from_row == home_row
+            and from_col == 4
+            and to_row == from_row
+            and to_col in (2, 6)
+        )
+
+        if is_castle_attempt:
+            if to_col == 2 and queenside:
+                castled = self._castle(from_row, from_col, to_col)
+            elif to_col == 6 and kingside:
+                castled = self._castle(from_row, from_col, to_col)
+        else:
+            moved = self.board.move(from_row, from_col, to_row, to_col)
+
+        if moved or castled:
+            # Castling revocation logic
             if isinstance(piece, King):
                 self.state.revoke_castling(self.state.current_color, "queenside")
                 self.state.revoke_castling(self.state.current_color, "kingside")
