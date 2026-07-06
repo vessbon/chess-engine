@@ -46,6 +46,12 @@ class Board:
         self._validate_coords(row, col)
         self.grid[row][col] = piece
 
+    def get_pieces(self) -> list[Piece]:
+        return [piece for _, piece in self._iter_pieces()]
+
+    def get_piece_locations(self) -> dict[Piece, Coordinate]:
+        return {piece: coord for coord, piece in self._iter_pieces()}
+
     def move(self, from_row: int, from_col: int, to_row: int, to_col: int) -> bool:
         piece = self.get(from_row, from_col)
         if piece is None:
@@ -91,6 +97,12 @@ class Board:
     def _validate_coords(self, row: int, col: int) -> None:
         if not self.in_bounds(row, col):
             raise IndexError(f"Out of bounds: ({row}, {col})")
+
+    def _iter_pieces(self):
+        for row in range(self.size):
+            for col in range(self.size):
+                if (piece := self.get(row, col)) is not None:
+                    yield (row, col), piece
 
     def __str__(self) -> str:
         rows = []
