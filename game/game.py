@@ -1,4 +1,5 @@
 from board import Board
+from chess_types import Color, Coordinate
 from pieces import King, Pawn, Rook
 
 from .game_state import GameState
@@ -11,6 +12,15 @@ class Game:
 
     def initialize(self) -> None:
         self.board.setup()
+
+    def legal_moves(self) -> dict[Color, dict[Coordinate, list[Coordinate]]]:
+        legal_moves = {Color.WHITE: {}, Color.BLACK: {}}
+
+        for piece, coord in self.board.get_piece_locations().items():
+            row, col = coord
+            legal_moves[piece.color][coord] = self.board.pseudo_moves(row, col)
+
+        return legal_moves
 
     def move(self, from_row: int, from_col: int, to_row: int, to_col: int) -> None:
         piece = self.board.get(from_row, from_col)
