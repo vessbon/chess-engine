@@ -41,6 +41,4 @@ class Pawn(Piece):
             if occupant and occupant.color != self.color:
                 moves.append(diagonal_step)
 
-        # TODO: En passant
-
         return moves
