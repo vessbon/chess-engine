@@ -54,5 +54,47 @@ class Game:
 
             self.next_turn()
 
+    def _castle(self, row: int, king_from_col: int, king_to_col: int) -> bool:
+        rook_from_col = 0 if king_to_col == 2 else 7
+        rook_to_col = 3 if king_to_col == 2 else 5
+
+        king = self.board.get(row, king_from_col)
+        rook = self.board.get(row, rook_from_col)
+
+        if not isinstance(king, King):
+            return False
+
+        if not isinstance(rook, Rook) or rook.color != king.color:
+            return False
+
+        path_start = min(king_from_col, rook_from_col) + 1
+        path_end = max(king_from_col, rook_from_col)
+
+        # Check if king squares are attacked
+        step = 1 if king_to_col > king_from_col else -1
+        for col in range(king_from_col, king_to_col + step, step):
+            print(row, col)
+
+        opposite_color_attacked_squares = {
+            item
+            for sublist in self.legal_moves()[king.color.opposite].values()
+            for item in sublist
+        }
+
+        # Check for pieces in the way of castling
+        for col in range(path_start, path_end):
+            if not self.board.is_empty(row, col):
+                return False
+
+            if (row, col) in opposite_color_attacked_squares:
+                return False
+
+        self.board.set(row, king_from_col, None)
+        self.board.set(row, rook_from_col, None)
+        self.board.set(row, king_to_col, king)
+        self.board.set(row, rook_to_col, rook)
+
+        return True
+
     def next_turn(self) -> None:
         self.state.toggle_moving_color()
