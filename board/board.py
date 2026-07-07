@@ -1,5 +1,4 @@
 import builtins
-from typing import Optional
 
 from chess_types import Color, Coordinate, Move
 from constants import (
@@ -15,7 +14,7 @@ from pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
 class Board:
     def __init__(self) -> None:
         self.size = BOARD_SIZE
-        self.grid: list[list[Optional[Piece]]] = [
+        self.grid: list[list[Piece | None]] = [
             [None for _ in range(self.size)] for _ in range(self.size)
         ]
 
@@ -46,11 +45,11 @@ class Board:
             for c in range(self.size):
                 self.grid[r][c] = None
 
-    def get(self, row: int, col: int) -> Optional[Piece]:
+    def get(self, row: int, col: int) -> Piece | None:
         self._validate_coords(row, col)
         return self.grid[row][col]
 
-    def set(self, row: int, col: int, piece: Optional[Piece]) -> None:
+    def set(self, row: int, col: int, piece: Piece | None) -> None:
         self._validate_coords(row, col)
         self.grid[row][col] = piece
 
