@@ -22,6 +22,27 @@ class Game:
 
         return legal_moves
 
+    def attacked_squares(self, by_color: Color) -> set[Coordinate]:
+        attacked: set[Coordinate] = set()
+
+        for piece, coord in self.board.get_piece_locations().items():
+            if piece.color != by_color:
+                continue
+
+            row, col = coord
+
+            if isinstance(piece, Pawn):
+                direction = -1 if piece.color == Color.WHITE else 1
+                for dc in (-1, 1):
+                    square = (row + direction, col + dc)
+                    if self.board.in_bounds(*square):
+                        attacked.add(square)
+                continue
+
+            attacked.update(piece.moves(coord, self.board))
+
+        return attacked
+
     def move(self, from_row: int, from_col: int, to_row: int, to_col: int) -> None:
         piece = self.board.get(from_row, from_col)
         if piece is None or piece.color != self.state.current_color:
