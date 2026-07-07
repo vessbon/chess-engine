@@ -1,9 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Literal
 
 type Coordinate = tuple[int, int]
-type CastlingSide = Literal["kingside", "queenside"]
 
 
 class Color(Enum):
@@ -22,6 +20,11 @@ class MoveType(Enum):
     PROMOTION = auto()
 
 
+class CastlingSide(Enum):
+    KINGSIDE = auto()
+    QUEENSIDE = auto()
+
+
 @dataclass(frozen=True)
 class Move:
     start: Coordinate
@@ -31,5 +34,16 @@ class Move:
 
 @dataclass
 class CastlingRights:
-    kingside: bool = True
-    queenside: bool = True
+    rights: dict[CastlingSide, bool]
+
+    def __init__(self, castling_enabled: bool = True) -> None:
+        self.rights = {
+            CastlingSide.KINGSIDE: castling_enabled,
+            CastlingSide.QUEENSIDE: castling_enabled,
+        }
+
+    def __getitem__(self, side: CastlingSide) -> bool:
+        return self.rights[side]
+
+    def revoke(self, side: CastlingSide) -> None:
+        self.rights[side] = False
