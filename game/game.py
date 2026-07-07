@@ -1,7 +1,5 @@
-from typing import Optional
-
 from board import Board
-from chess_types import CastlingSide, Color, Coordinate
+from chess_types import CastlingSide, Color, Coordinate, Move, MoveType
 from constants import (
     BLACK_HOME_ROW,
     KING_START_COL,
@@ -26,29 +24,29 @@ class Game:
     def initialize(self) -> None:
         self.board.setup()
 
-    def legal_moves_from_square(self, row: int, col: int):
+    def legal_moves_from_square(self, row: int, col: int) -> set[Move]:
         piece = self.board.get(row, col)
         if piece is None:
-            return []
+            return set()
 
         moves = self.board.pseudo_moves(row, col)
 
         if isinstance(piece, Pawn):
             en_passant_move = self._en_passant_move(row, col)
             if en_passant_move:
-                moves.append(en_passant_move)
+                moves.add(en_passant_move)
 
         if isinstance(piece, King):
-            moves.extend(self._castling_moves(piece.color))
+            moves.update(self._castling_moves(piece.color))
 
-        return self._filter_checks(moves)
+        return moves
 
-    def legal_moves(self) -> dict[Color, dict[Coordinate, list[Coordinate]]]:
-        legal_moves = {Color.WHITE: {}, Color.BLACK: {}}
+    def legal_moves(self) -> dict[Color, set[Move]]:
+        legal_moves: dict[Color, set[Move]] = {Color.WHITE: set(), Color.BLACK: set()}
 
         for piece, coord in self.board.get_piece_locations().items():
             row, col = coord
-            legal_moves[piece.color][coord] = self.legal_moves_from_square(row, col)
+            legal_moves[piece.color].update(self.legal_moves_from_square(row, col))
 
         return legal_moves
 
@@ -78,12 +76,12 @@ class Game:
         if piece is None or piece.color != self.state.current_color:
             return
 
-        if (to_row, to_col) not in self.legal_moves_from_square(from_row, from_col):
+        legal_moves = self.legal_moves_from_square(from_row, from_col)
+        matched_move = self._get_matched_move((to_row, to_col), legal_moves)
+        if matched_move is None:
             return
 
-        success, captured = self._execute_move(
-            piece, from_row, from_col, to_row, to_col
-        )
+        success, captured = self._execute_move(matched_move)
 
         if success:
             self._update_castling_rights(piece, from_col)
@@ -95,37 +93,17 @@ class Game:
 
             self.next_turn()
 
-    def _execute_move(
-        self, piece: Piece, from_row: int, from_col: int, to_row: int, to_col: int
-    ) -> tuple[bool, Piece | None]:
-        home_row = (
-            WHITE_HOME_ROW
-            if self.state.current_color == Color.WHITE
-            else BLACK_HOME_ROW
-        )
-
+    def _execute_move(self, move: Move) -> tuple[bool, Piece | None]:
         success = False
-        captured_piece = self.board.get(to_row, to_col)
+        captured_piece = self.board.get(*move.end)
 
-        is_castle_attempt = (
-            isinstance(piece, King)
-            and from_row == home_row
-            and from_col == KING_START_COL
-            and to_row == from_row
-            and to_col in (KINGSIDE_KING_DEST, QUEENSIDE_KING_DEST)
-        )
-
-        is_en_passant_attempt = (
-            isinstance(piece, Pawn) and (to_row, to_col) == self.state.en_passant_square
-        )
-
-        if is_castle_attempt:
-            success = self._castle(from_row, to_col)
-        elif is_en_passant_attempt:
-            captured_piece = self.board.get(from_row, to_col)
-            success = self._perform_en_passant(from_row, from_col, to_row, to_col)
+        if move.move_type == MoveType.CASTLE:
+            success = self._castle(move.start[0], move.end[1])
+        elif move.move_type == MoveType.EN_PASSANT:
+            captured_piece = self.board.get(move.start[0], move.end[1])
+            success = self._perform_en_passant(move)
         else:
-            success = self.board.move(from_row, from_col, to_row, to_col)
+            success = self.board.move(*move.start, *move.end)
 
         return (success, captured_piece)
 
@@ -140,7 +118,7 @@ class Game:
             passed_row = (from_row + to_row) // 2
             self.state.mark_en_passant((passed_row, from_col))
 
-    def _en_passant_move(self, row: int, col: int) -> Optional[Coordinate]:
+    def _en_passant_move(self, row: int, col: int) -> Move | None:
         pawn = self.board.get(row, col)
         if self.state.en_passant_square is None or not isinstance(pawn, Pawn):
             return
@@ -158,30 +136,39 @@ class Game:
         if not isinstance(captured, Pawn) or captured.color == pawn.color:
             return
 
-        return self.state.en_passant_square
+        return Move((row, col), self.state.en_passant_square, MoveType.EN_PASSANT)
 
-    def _perform_en_passant(
-        self, from_row: int, from_col: int, to_row: int, to_col: int
-    ) -> bool:
-        pawn = self.board.get(from_row, from_col)
+    def _perform_en_passant(self, move: Move) -> bool:
+        pawn = self.board.get(*move.start)
         if not isinstance(pawn, Pawn):
             return False
 
-        if (to_row, to_col) != self._en_passant_move(from_row, from_col):
+        en_passant_move = self._en_passant_move(*move.start)
+        if not en_passant_move or move.end != en_passant_move.end:
             return False
 
-        self.board.set(from_row, to_col, None)
-        self.board.move(from_row, from_col, to_row, to_col)
+        self.board.set(move.start[0], move.end[1], None)
+        self.board.move(*move.start, *move.end)
 
         return True
 
     def _update_castling_rights(self, piece: Piece, from_col: int) -> None:
-        if isinstance(piece, King) or isinstance(piece, Rook):
+        if isinstance(piece, King):
             self.state.revoke_castling(self.state.current_color, CastlingSide.QUEENSIDE)
             self.state.revoke_castling(self.state.current_color, CastlingSide.KINGSIDE)
 
-    def _castling_moves(self, color: Color) -> list[Coordinate]:
-        moves = []
+        if isinstance(piece, Rook):
+            if from_col == QUEENSIDE_ROOK_COL:
+                self.state.revoke_castling(
+                    self.state.current_color, CastlingSide.QUEENSIDE
+                )
+            elif from_col == KINGSIDE_ROOK_COL:
+                self.state.revoke_castling(
+                    self.state.current_color, CastlingSide.KINGSIDE
+                )
+
+    def _castling_moves(self, color: Color) -> set[Move]:
+        moves = set()
         home_row = WHITE_HOME_ROW if color == Color.WHITE else BLACK_HOME_ROW
 
         sides = {
@@ -228,7 +215,13 @@ class Game:
             ):
                 continue
 
-            moves.append((home_row, info["king_to"]))
+            moves.add(
+                Move(
+                    (home_row, KING_START_COL),
+                    (home_row, info["king_to"]),
+                    MoveType.CASTLE,
+                )
+            )
 
         return moves
 
@@ -246,16 +239,25 @@ class Game:
         )
 
         king = self.board.get(row, KING_START_COL)
+
         if not isinstance(king, King) or king.color != self.state.current_color:
             return False
 
-        if (row, king_to_col) not in self._castling_moves(king.color):
+        matched_move = self._get_matched_move(
+            (row, king_to_col), self._castling_moves(king.color)
+        )
+        if matched_move is None:
             return False
 
         self.board.move(row, KING_START_COL, row, king_to_col)
         self.board.move(row, rook_from_col, row, rook_to_col)
 
         return True
+
+    def _get_matched_move(
+        self, to_coord: Coordinate, move_set: set[Move]
+    ) -> Move | None:
+        return next((m for m in move_set if m.end == to_coord), None)
 
     def next_turn(self) -> None:
         self.state.toggle_moving_color()
