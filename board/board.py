@@ -4,7 +4,7 @@ from chess_types import Color, Coordinate, Move
 from constants import (
     BLACK_HOME_ROW,
     BLACK_PAWN_ROW,
-    BOARD_SIZE,
+    BOARD_DIMENSION,
     WHITE_HOME_ROW,
     WHITE_PAWN_ROW,
 )
@@ -13,7 +13,7 @@ from pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
 
 class Board:
     def __init__(self) -> None:
-        self.size = BOARD_SIZE
+        self.size = BOARD_DIMENSION
         self.grid: list[list[Piece | None]] = [
             [None for _ in range(self.size)] for _ in range(self.size)
         ]
