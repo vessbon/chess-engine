@@ -2,7 +2,18 @@ from typing import Optional
 
 from board import Board
 from chess_types import Color, Coordinate
-from pieces import King, Pawn, Rook
+from constants import (
+    BLACK_HOME_ROW,
+    KING_START_COL,
+    KINGSIDE_KING_DEST,
+    KINGSIDE_ROOK_COL,
+    QUEENSIDE_KING_DEST,
+    QUEENSIDE_ROOK_COL,
+    ROOK_KINGSIDE_DEST,
+    ROOK_QUEENSIDE_DEST,
+    WHITE_HOME_ROW,
+)
+from pieces import King, Pawn, Piece, Rook
 
 from .game_state import GameState
 
@@ -157,16 +168,17 @@ class Game:
 
     def _castling_moves(self, color: Color) -> list[Coordinate]:
         moves = []
-
-        king_from_col = 4
-        home_row = 7 if color == Color.WHITE else 0
+        home_row = WHITE_HOME_ROW if color == Color.WHITE else BLACK_HOME_ROW
 
         sides = {
-            "kingside": {"rook_from": 7, "king_to": 6},
-            "queenside": {"rook_from": 0, "king_to": 2},
+            "kingside": {"rook_from": KINGSIDE_ROOK_COL, "king_to": KINGSIDE_KING_DEST},
+            "queenside": {
+                "rook_from": QUEENSIDE_ROOK_COL,
+                "king_to": QUEENSIDE_KING_DEST,
+            },
         }
 
-        king = self.board.get(home_row, king_from_col)
+        king = self.board.get(home_row, KING_START_COL)
 
         if not isinstance(king, King) or king.color != color:
             return moves
@@ -182,8 +194,8 @@ class Game:
             if not isinstance(rook, Rook) or rook.color != color:
                 continue
 
-            path_start = min(king_from_col, info["rook_from"]) + 1
-            path_end = max(king_from_col, info["rook_from"])
+            path_start = min(KING_START_COL, info["rook_from"]) + 1
+            path_end = max(KING_START_COL, info["rook_from"])
 
             if any(
                 not self.board.is_empty(home_row, col)
@@ -191,8 +203,8 @@ class Game:
             ):
                 continue
 
-            step = 1 if info["king_to"] > king_from_col else -1
-            king_path = range(king_from_col, info["king_to"] + step, step)
+            step = 1 if info["king_to"] > KING_START_COL else -1
+            king_path = range(KING_START_COL, info["king_to"] + step, step)
 
             if any(
                 (home_row, col) in opposite_color_attacked_squares for col in king_path
@@ -204,19 +216,26 @@ class Game:
         return moves
 
     def _castle(self, row: int, king_to_col: int) -> bool:
-        king_from_col = 4
+        rook_from_col = (
+            QUEENSIDE_ROOK_COL
+            if king_to_col == QUEENSIDE_KING_DEST
+            else KINGSIDE_ROOK_COL
+        )
 
-        rook_from_col = 0 if king_to_col == 2 else 7
-        rook_to_col = 3 if king_to_col == 2 else 5
+        rook_to_col = (
+            ROOK_QUEENSIDE_DEST
+            if king_to_col == QUEENSIDE_KING_DEST
+            else ROOK_KINGSIDE_DEST
+        )
 
-        king = self.board.get(row, king_from_col)
+        king = self.board.get(row, KING_START_COL)
         if not isinstance(king, King) or king.color != self.state.current_color:
             return False
 
         if (row, king_to_col) not in self._castling_moves(king.color):
             return False
 
-        self.board.move(row, king_from_col, row, king_to_col)
+        self.board.move(row, KING_START_COL, row, king_to_col)
         self.board.move(row, rook_from_col, row, rook_to_col)
 
         return True
