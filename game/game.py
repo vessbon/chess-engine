@@ -131,6 +131,14 @@ class Game:
     def _filter_checks(self, moves: list[Coordinate]):
         return moves
 
+    def _update_en_passant_state(
+        self, piece: Piece, from_col: int, from_row: int, to_row: int
+    ) -> None:
+        self.state.clear_en_passant()
+        if isinstance(piece, Pawn) and abs(to_row - from_row) == 2:
+            passed_row = (from_row + to_row) // 2
+            self.state.mark_en_passant((passed_row, from_col))
+
     def _en_passant_move(self, row: int, col: int) -> Optional[Coordinate]:
         pawn = self.board.get(row, col)
         if self.state.en_passant_square is None or not isinstance(pawn, Pawn):
@@ -165,6 +173,17 @@ class Game:
         self.board.move(from_row, from_col, to_row, to_col)
 
         return True
+
+    def _update_castling_rights(self, piece: Piece, from_col: int) -> None:
+        if isinstance(piece, King):
+            self.state.revoke_castling(self.state.current_color, "queenside")
+            self.state.revoke_castling(self.state.current_color, "kingside")
+
+        if isinstance(piece, Rook):
+            if from_col == QUEENSIDE_ROOK_COL:
+                self.state.revoke_castling(self.state.current_color, "queenside")
+            elif from_col == KINGSIDE_ROOK_COL:
+                self.state.revoke_castling(self.state.current_color, "kingside")
 
     def _castling_moves(self, color: Color) -> list[Coordinate]:
         moves = []
