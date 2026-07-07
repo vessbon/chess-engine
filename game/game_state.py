@@ -14,8 +14,8 @@ class GameState:
         self.time_left: float = start_time  # ms
 
         self.castling: dict[Color, CastlingRights] = {
-            Color.WHITE: CastlingRights(castling_enabled, castling_enabled),
-            Color.BLACK: CastlingRights(castling_enabled, castling_enabled),
+            Color.WHITE: CastlingRights(castling_enabled),
+            Color.BLACK: CastlingRights(castling_enabled),
         }
 
         self.white_captures: list[Piece] = []
@@ -39,7 +39,7 @@ class GameState:
         self.en_passant_square = None
 
     def revoke_castling(self, color: Color, side: CastlingSide) -> None:
-        setattr(self.castling[color], side, False)
+        self.castling[color].revoke(side)
 
     def record_capture(self, captured_piece: Piece):
         self._give_points(self.current_color, int(captured_piece.VALUE))
@@ -56,10 +56,12 @@ class GameState:
 
     def __str__(self) -> str:
         white_castling_rights = (
-            self.castling[Color.WHITE].kingside or self.castling[Color.WHITE].queenside
+            self.castling[Color.WHITE][CastlingSide.KINGSIDE]
+            or self.castling[Color.WHITE][CastlingSide.QUEENSIDE]
         )
         black_castling_rights = (
-            self.castling[Color.BLACK].kingside or self.castling[Color.BLACK].queenside
+            self.castling[Color.BLACK][CastlingSide.KINGSIDE]
+            or self.castling[Color.BLACK][CastlingSide.QUEENSIDE]
         )
 
         return (
