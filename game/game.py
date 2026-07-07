@@ -1,7 +1,7 @@
 from typing import Optional
 
 from board import Board
-from chess_types import Color, Coordinate
+from chess_types import CastlingSide, Color, Coordinate
 from constants import (
     BLACK_HOME_ROW,
     KING_START_COL,
@@ -176,23 +176,20 @@ class Game:
         return True
 
     def _update_castling_rights(self, piece: Piece, from_col: int) -> None:
-        if isinstance(piece, King):
-            self.state.revoke_castling(self.state.current_color, "queenside")
-            self.state.revoke_castling(self.state.current_color, "kingside")
-
-        if isinstance(piece, Rook):
-            if from_col == QUEENSIDE_ROOK_COL:
-                self.state.revoke_castling(self.state.current_color, "queenside")
-            elif from_col == KINGSIDE_ROOK_COL:
-                self.state.revoke_castling(self.state.current_color, "kingside")
+        if isinstance(piece, King) or isinstance(piece, Rook):
+            self.state.revoke_castling(self.state.current_color, CastlingSide.QUEENSIDE)
+            self.state.revoke_castling(self.state.current_color, CastlingSide.KINGSIDE)
 
     def _castling_moves(self, color: Color) -> list[Coordinate]:
         moves = []
         home_row = WHITE_HOME_ROW if color == Color.WHITE else BLACK_HOME_ROW
 
         sides = {
-            "kingside": {"rook_from": KINGSIDE_ROOK_COL, "king_to": KINGSIDE_KING_DEST},
-            "queenside": {
+            CastlingSide.KINGSIDE: {
+                "rook_from": KINGSIDE_ROOK_COL,
+                "king_to": KINGSIDE_KING_DEST,
+            },
+            CastlingSide.QUEENSIDE: {
                 "rook_from": QUEENSIDE_ROOK_COL,
                 "king_to": QUEENSIDE_KING_DEST,
             },
@@ -206,7 +203,7 @@ class Game:
         opposite_color_attacked_squares = self.attacked_squares(color.opposite)
 
         for side, info in sides.items():
-            if not getattr(self.state.castling[color], side):
+            if not self.state.castling[color][side]:
                 continue
 
             rook = self.board.get(home_row, info["rook_from"])
