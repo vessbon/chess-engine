@@ -53,17 +53,14 @@ class Board:
         return {piece: coord for coord, piece in self._iter_pieces()}
 
     def move(self, from_row: int, from_col: int, to_row: int, to_col: int) -> bool:
+        self._validate_coords(to_col, to_row)
         piece = self.get(from_row, from_col)
         if piece is None:
             return False
 
-        pseudo_legal_moves = self.pseudo_moves(from_row, from_col)
-        if (to_row, to_col) in pseudo_legal_moves:
-            self.set(from_row, from_col, None)
-            self.set(to_row, to_col, piece)
-            return True
-
-        return False
+        self.set(from_row, from_col, None)
+        self.set(to_row, to_col, piece)
+        return True
 
     def pseudo_moves(self, row: int, col: int) -> list[Coordinate]:
         self._validate_coords(row, col)
