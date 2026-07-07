@@ -13,7 +13,7 @@ from constants import (
 )
 from pieces import King, Pawn, Piece, Rook
 
-from .game_state import GameState
+from .state import GameState
 
 
 class Game:
@@ -23,6 +23,7 @@ class Game:
 
     def initialize(self) -> None:
         self.board.setup()
+        self.state.clock.is_running = False
 
     def legal_moves_from_square(self, row: int, col: int) -> set[Move]:
         piece = self.board.get(row, col)
@@ -92,6 +93,10 @@ class Game:
                 self.state.record_capture(captured)
 
             self.next_turn()
+
+    def next_turn(self) -> None:
+        self.state.clock.commit_move(self.state.current_color)
+        self.state.toggle_moving_color()
 
     def _execute_move(self, move: Move) -> tuple[bool, Piece | None]:
         success = False
@@ -258,6 +263,3 @@ class Game:
         self, to_coord: Coordinate, move_set: set[Move]
     ) -> Move | None:
         return next((m for m in move_set if m.end == to_coord), None)
-
-    def next_turn(self) -> None:
-        self.state.toggle_moving_color()

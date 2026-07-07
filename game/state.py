@@ -1,17 +1,18 @@
 from chess_types import CastlingRights, CastlingSide, Color, Coordinate
 from pieces import Piece
 
+from .clock import ChessClock
+
 
 class GameState:
     def __init__(
         self,
         white_start: bool = True,
         castling_enabled: bool = True,
-        start_time: float = 600_000,
     ) -> None:
         self.current_color: Color = Color.WHITE if white_start else Color.BLACK
 
-        self.time_left: float = start_time  # ms
+        self.clock = ChessClock(initial_minutes=5, increment_seconds=3)
 
         self.castling: dict[Color, CastlingRights] = {
             Color.WHITE: CastlingRights(castling_enabled),
@@ -66,7 +67,8 @@ class GameState:
 
         return (
             f"{self.current_color.value} to move\n"
-            f"{self.time_left / 1000} seconds left\n"
+            f"white time left: {self.clock.get_time_string(Color.WHITE)}\n"
+            f"black time left: {self.clock.get_time_string(Color.BLACK)}\n"
             f"white can{'' if white_castling_rights else 'not'} castle\n"
             f"black can{'' if black_castling_rights else 'not'} castle\n"
             f"en passant {
