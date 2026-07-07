@@ -13,7 +13,7 @@ from constants import (
 )
 from pieces import King, Pawn, Piece, Rook
 
-from .game_state import GameState
+from .state import GameState
 
 
 class Game:
