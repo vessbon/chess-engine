@@ -13,5 +13,5 @@ class King(Piece):
     def symbol(self):
         return "K" if self.color == Color.WHITE else "k"
 
-    def moves(self, position, board):
-        return self._stepping_moves(position, board, ALL_DIRECTIONS)
+    def moves(self, square, board):
+        return self._stepping_moves(square, board, ALL_DIRECTIONS)

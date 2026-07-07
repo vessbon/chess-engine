@@ -1,13 +1,20 @@
-from typing import Optional
+import builtins
 
-from chess_types import Color, Coordinate
+from chess_types import Color, Coordinate, Move
+from constants import (
+    BLACK_HOME_ROW,
+    BLACK_PAWN_ROW,
+    BOARD_SIZE,
+    WHITE_HOME_ROW,
+    WHITE_PAWN_ROW,
+)
 from pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
 
 
 class Board:
     def __init__(self) -> None:
-        self.size = 8
-        self.grid: list[list[Optional[Piece]]] = [
+        self.size = BOARD_SIZE
+        self.grid: list[list[Piece | None]] = [
             [None for _ in range(self.size)] for _ in range(self.size)
         ]
 
@@ -26,23 +33,23 @@ class Board:
         ]
 
         for i in range(self.size):
-            self.set(1, i, Pawn(Color.BLACK))
-            self.set(6, i, Pawn(Color.WHITE))
+            self.set(BLACK_PAWN_ROW, i, Pawn(Color.BLACK))
+            self.set(WHITE_PAWN_ROW, i, Pawn(Color.WHITE))
 
         for i, piece in enumerate(back_rank):
-            self.set(0, i, piece(Color.BLACK))
-            self.set(7, i, piece(Color.WHITE))
+            self.set(BLACK_HOME_ROW, i, piece(Color.BLACK))
+            self.set(WHITE_HOME_ROW, i, piece(Color.WHITE))
 
     def reset(self) -> None:
         for r in range(self.size):
             for c in range(self.size):
                 self.grid[r][c] = None
 
-    def get(self, row: int, col: int) -> Optional[Piece]:
+    def get(self, row: int, col: int) -> Piece | None:
         self._validate_coords(row, col)
         return self.grid[row][col]
 
-    def set(self, row: int, col: int, piece: Optional[Piece]) -> None:
+    def set(self, row: int, col: int, piece: Piece | None) -> None:
         self._validate_coords(row, col)
         self.grid[row][col] = piece
 
@@ -53,7 +60,7 @@ class Board:
         return {piece: coord for coord, piece in self._iter_pieces()}
 
     def move(self, from_row: int, from_col: int, to_row: int, to_col: int) -> bool:
-        self._validate_coords(to_col, to_row)
+        self._validate_coords(to_row, to_col)
         piece = self.get(from_row, from_col)
         if piece is None:
             return False
@@ -62,14 +69,14 @@ class Board:
         self.set(to_row, to_col, piece)
         return True
 
-    def pseudo_moves(self, row: int, col: int) -> list[Coordinate]:
+    def pseudo_moves(self, row: int, col: int) -> builtins.set[Move]:
         self._validate_coords(row, col)
         piece = self.grid[row][col]
 
         if piece is None:
-            return []
+            return set()
 
-        moves = []
+        moves = set()
 
         for move_row, move_col in piece.moves((row, col), self):
             if not self.in_bounds(move_row, move_col):
@@ -80,7 +87,7 @@ class Board:
             if isinstance(occupant, King):
                 continue
 
-            moves.append((move_row, move_col))
+            moves.add(Move((row, col), (move_row, move_col)))
 
         return moves
 

@@ -10,8 +10,8 @@ class Pawn(Piece):
     def symbol(self):
         return "P" if self.color == Color.WHITE else "p"
 
-    def moves(self, position, board):
-        row, col = position
+    def moves(self, square, board):
+        row, col = square
 
         direction = -1 if self.color == Color.WHITE else 1
         start_row = 6 if self.color == Color.WHITE else 1
