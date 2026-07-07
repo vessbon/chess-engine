@@ -67,11 +67,6 @@ class Game:
         home_row = 7 if self.state.current_color == Color.WHITE else 0
 
         moved = False
-        castled = False
-
-        # Castling logic
-        kingside = self.state.castling[self.state.current_color].kingside
-        queenside = self.state.castling[self.state.current_color].queenside
 
         is_castle_attempt = (
             isinstance(piece, King)
@@ -81,15 +76,19 @@ class Game:
             and to_col in (2, 6)
         )
 
-        if is_castle_attempt:
-            if to_col == 2 and queenside:
-                castled = self._castle(from_row, from_col, to_col)
-            elif to_col == 6 and kingside:
-                castled = self._castle(from_row, from_col, to_col)
-        else:
-            moved = self.board.move(from_row, from_col, to_row, to_col)
+        is_en_passant_attempt = (
+            isinstance(piece, Pawn) and (to_row, to_col) == self.state.en_passant_square
+        )
 
-        if moved or castled:
+        if (to_row, to_col) in self.legal_moves_from_square(from_row, from_col):
+            if is_castle_attempt:
+                moved = self._castle(from_row, to_col)
+            elif is_en_passant_attempt:
+                moved = self._perform_en_passant(from_row, from_col)
+            else:
+                moved = self.board.move(from_row, from_col, to_row, to_col)
+
+        if moved:
             # Castling revocation logic
             if isinstance(piece, King):
                 self.state.revoke_castling(self.state.current_color, "queenside")
