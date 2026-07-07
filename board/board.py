@@ -60,7 +60,7 @@ class Board:
         return {piece: coord for coord, piece in self._iter_pieces()}
 
     def move(self, from_row: int, from_col: int, to_row: int, to_col: int) -> bool:
-        self._validate_coords(to_col, to_row)
+        self._validate_coords(to_row, to_col)
         piece = self.get(from_row, from_col)
         if piece is None:
             return False
