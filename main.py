@@ -25,6 +25,15 @@ def main():
     game.move(1, 2, 3, 2)
 
     game.move(3, 3, 2, 2)
+    game.move(1, 6, 2, 6)
+
+    game.move(7, 2, 5, 0)
+    game.move(2, 6, 3, 6)
+
+    game.move(7, 1, 5, 2)
+    game.move(0, 3, 3, 0)
+
+    game.move(7, 4, 7, 2)
 
     print(f"\n{game.board}\n")
     print(f"\n{game.state}\n")
