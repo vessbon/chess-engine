@@ -13,12 +13,27 @@ class Game:
     def initialize(self) -> None:
         self.board.setup()
 
+    def legal_moves_from_square(self, row: int, col: int):
+        piece = self.board.get(row, col)
+        if piece is None:
+            return []
+
+        moves = self.board.pseudo_moves(row, col)
+
+        if isinstance(piece, Pawn):
+            moves.extend(self._en_passant_moves())
+
+        if isinstance(piece, King):
+            moves.extend(self._castling_moves(piece.color))
+
+        return self._filter_checks(moves)
+
     def legal_moves(self) -> dict[Color, dict[Coordinate, list[Coordinate]]]:
         legal_moves = {Color.WHITE: {}, Color.BLACK: {}}
 
         for piece, coord in self.board.get_piece_locations().items():
             row, col = coord
-            legal_moves[piece.color][coord] = self.board.pseudo_moves(row, col)
+            legal_moves[piece.color][coord] = self.legal_moves_from_square(row, col)
 
         return legal_moves
 
