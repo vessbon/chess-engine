@@ -78,55 +78,56 @@ class Game:
         if piece is None or piece.color != self.state.current_color:
             return
 
-        target = self.board.get(to_row, to_col)
-        home_row = 7 if self.state.current_color == Color.WHITE else 0
+        if (to_row, to_col) not in self.legal_moves_from_square(from_row, from_col):
+            return
 
-        moved = False
+        success, captured = self._execute_move(
+            piece, from_row, from_col, to_row, to_col
+        )
+
+        if success:
+            self._update_castling_rights(piece, from_col)
+            self._update_en_passant_state(piece, from_col, from_row, to_row)
+
+            # Capture logic
+            if captured is not None and captured.color != piece.color:
+                self.state.record_capture(captured)
+
+            self.next_turn()
+
+    def _execute_move(
+        self, piece: Piece, from_row: int, from_col: int, to_row: int, to_col: int
+    ) -> tuple[bool, Piece | None]:
+        home_row = (
+            WHITE_HOME_ROW
+            if self.state.current_color == Color.WHITE
+            else BLACK_HOME_ROW
+        )
+
+        success = False
+        captured_piece = self.board.get(to_row, to_col)
 
         is_castle_attempt = (
             isinstance(piece, King)
             and from_row == home_row
-            and from_col == 4
+            and from_col == KING_START_COL
             and to_row == from_row
-            and to_col in (2, 6)
+            and to_col in (KINGSIDE_KING_DEST, QUEENSIDE_KING_DEST)
         )
 
         is_en_passant_attempt = (
             isinstance(piece, Pawn) and (to_row, to_col) == self.state.en_passant_square
         )
 
-        if (to_row, to_col) in self.legal_moves_from_square(from_row, from_col):
-            if is_castle_attempt:
-                moved = self._castle(from_row, to_col)
-            elif is_en_passant_attempt:
-                target = self.board.get(from_row, to_col)
-                moved = self._perform_en_passant(from_row, from_col, to_row, to_col)
-            else:
-                moved = self.board.move(from_row, from_col, to_row, to_col)
+        if is_castle_attempt:
+            success = self._castle(from_row, to_col)
+        elif is_en_passant_attempt:
+            captured_piece = self.board.get(from_row, to_col)
+            success = self._perform_en_passant(from_row, from_col, to_row, to_col)
+        else:
+            success = self.board.move(from_row, from_col, to_row, to_col)
 
-        if moved:
-            # Castling revocation logic
-            if isinstance(piece, King):
-                self.state.revoke_castling(self.state.current_color, "queenside")
-                self.state.revoke_castling(self.state.current_color, "kingside")
-
-            if isinstance(piece, Rook):
-                if from_col == 0:
-                    self.state.revoke_castling(self.state.current_color, "queenside")
-                elif from_col == 7:
-                    self.state.revoke_castling(self.state.current_color, "kingside")
-
-            # En passant logic
-            self.state.clear_en_passant()
-            if isinstance(piece, Pawn) and abs(to_row - from_row) == 2:
-                passed_row = (from_row + to_row) // 2
-                self.state.mark_en_passant((passed_row, from_col))
-
-            # Capture logic
-            if target is not None and target.color != piece.color:
-                self.state.record_capture(target)
-
-            self.next_turn()
+        return (success, captured_piece)
 
     def _filter_checks(self, moves: list[Coordinate]):
         return moves
