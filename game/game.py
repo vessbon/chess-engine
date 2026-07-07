@@ -1,3 +1,5 @@
+from typing import Optional
+
 from board import Board
 from chess_types import Color, Coordinate
 from pieces import King, Pawn, Rook
