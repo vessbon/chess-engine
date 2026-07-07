@@ -21,7 +21,9 @@ class Game:
         moves = self.board.pseudo_moves(row, col)
 
         if isinstance(piece, Pawn):
-            moves.extend(self._en_passant_moves())
+            en_passant_move = self._en_passant_move(row, col)
+            if en_passant_move:
+                moves.append(en_passant_move)
 
         if isinstance(piece, King):
             moves.extend(self._castling_moves(piece.color))
@@ -84,7 +86,8 @@ class Game:
             if is_castle_attempt:
                 moved = self._castle(from_row, to_col)
             elif is_en_passant_attempt:
-                moved = self._perform_en_passant(from_row, from_col)
+                target = self.board.get(from_row, to_col)
+                moved = self._perform_en_passant(from_row, from_col, to_row, to_col)
             else:
                 moved = self.board.move(from_row, from_col, to_row, to_col)
 
@@ -112,34 +115,43 @@ class Game:
 
             self.next_turn()
 
-    def _castle(self, row: int, king_from_col: int, king_to_col: int) -> bool:
-        rook_from_col = 0 if king_to_col == 2 else 7
-        rook_to_col = 3 if king_to_col == 2 else 5
+    def _filter_checks(self, moves: list[Coordinate]):
+        return moves
 
-        king = self.board.get(row, king_from_col)
-        rook = self.board.get(row, rook_from_col)
-
-    def _perform_en_passant(self, from_row: int, from_col: int) -> bool:
-        pawn = self.board.get(from_row, from_col)
+    def _en_passant_move(self, row: int, col: int) -> Optional[Coordinate]:
+        pawn = self.board.get(row, col)
         if self.state.en_passant_square is None or not isinstance(pawn, Pawn):
-            return False
+            return
 
         en_passant_row, en_passant_col = self.state.en_passant_square
-
         direction = 1 if pawn.color == Color.BLACK else -1
 
-        for dc in (1, -1):
-            target_col = from_col + dc
-            diagonal_step: Coordinate = (from_row + direction, target_col)
-            if diagonal_step == self.state.en_passant_square:
-                target = self.board.get(from_row, target_col)
-                if isinstance(target, Pawn) and target.color != pawn.color:
-                    self.board.set(from_row, target_col, None)
-                    self.board.move(from_row, from_col, en_passant_row, en_passant_col)
+        if en_passant_row != row + direction:
+            return
 
-                return True
+        if abs(en_passant_col - col) != 1:
+            return
 
-        return False
+        captured = self.board.get(row, en_passant_col)
+        if not isinstance(captured, Pawn) or captured.color == pawn.color:
+            return
+
+        return self.state.en_passant_square
+
+    def _perform_en_passant(
+        self, from_row: int, from_col: int, to_row: int, to_col: int
+    ) -> bool:
+        pawn = self.board.get(from_row, from_col)
+        if not isinstance(pawn, Pawn):
+            return False
+
+        if (to_row, to_col) != self._en_passant_move(from_row, from_col):
+            return False
+
+        self.board.set(from_row, to_col, None)
+        self.board.move(from_row, from_col, to_row, to_col)
+
+        return True
 
     def _castling_moves(self, color: Color) -> list[Coordinate]:
         moves = []
