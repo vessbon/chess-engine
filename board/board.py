@@ -1,12 +1,19 @@
 from typing import Optional
 
 from chess_types import Color, Coordinate
+from constants import (
+    BLACK_HOME_ROW,
+    BLACK_PAWN_ROW,
+    BOARD_SIZE,
+    WHITE_HOME_ROW,
+    WHITE_PAWN_ROW,
+)
 from pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
 
 
 class Board:
     def __init__(self) -> None:
-        self.size = 8
+        self.size = BOARD_SIZE
         self.grid: list[list[Optional[Piece]]] = [
             [None for _ in range(self.size)] for _ in range(self.size)
         ]
@@ -26,12 +33,12 @@ class Board:
         ]
 
         for i in range(self.size):
-            self.set(1, i, Pawn(Color.BLACK))
-            self.set(6, i, Pawn(Color.WHITE))
+            self.set(BLACK_PAWN_ROW, i, Pawn(Color.BLACK))
+            self.set(WHITE_PAWN_ROW, i, Pawn(Color.WHITE))
 
         for i, piece in enumerate(back_rank):
-            self.set(0, i, piece(Color.BLACK))
-            self.set(7, i, piece(Color.WHITE))
+            self.set(BLACK_HOME_ROW, i, piece(Color.BLACK))
+            self.set(WHITE_HOME_ROW, i, piece(Color.WHITE))
 
     def reset(self) -> None:
         for r in range(self.size):
