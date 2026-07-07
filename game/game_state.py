@@ -1,17 +1,5 @@
-from dataclasses import dataclass
-from typing import Literal, Optional
-
-from chess_types import Color, Coordinate
+from chess_types import CastlingRights, CastlingSide, Color, Coordinate
 from pieces import Piece
-
-
-@dataclass
-class CastlingRights:
-    kingside: bool = True
-    queenside: bool = True
-
-
-type CastlingSide = Literal["kingside", "queenside"]
 
 
 class GameState:
@@ -36,7 +24,7 @@ class GameState:
         self.white_points: int = 0
         self.black_points: int = 0
 
-        self.en_passant_square: Optional[Coordinate] = None
+        self.en_passant_square: Coordinate | None = None
 
     def toggle_moving_color(self) -> None:
         if self.current_color == Color.WHITE:
