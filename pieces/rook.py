@@ -11,5 +11,5 @@ class Rook(Piece):
     def symbol(self):
         return "R" if self.color == Color.WHITE else "r"
 
-    def moves(self, position, board):
-        return self._sliding_moves(position, board, STRAIGHT_DIRECTIONS)
+    def moves(self, square, board):
+        return self._sliding_moves(square, board, STRAIGHT_DIRECTIONS)

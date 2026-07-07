@@ -11,5 +11,5 @@ class Queen(Piece):
     def symbol(self):
         return "Q" if self.color == Color.WHITE else "q"
 
-    def moves(self, position, board):
-        return self._sliding_moves(position, board, ALL_DIRECTIONS)
+    def moves(self, square, board):
+        return self._sliding_moves(square, board, ALL_DIRECTIONS)

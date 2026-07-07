@@ -11,5 +11,5 @@ class Bishop(Piece):
     def symbol(self):
         return "B" if self.color == Color.WHITE else "b"
 
-    def moves(self, position, board):
-        return self._sliding_moves(position, board, DIAGONAL_DIRECTIONS)
+    def moves(self, square, board):
+        return self._sliding_moves(square, board, DIAGONAL_DIRECTIONS)

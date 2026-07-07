@@ -29,13 +29,13 @@ class Piece(ABC):
         pass
 
     @abstractmethod
-    def moves(self, position: Coordinate, board: Board) -> list[Coordinate]:
+    def moves(self, square: Coordinate, board: Board) -> list[Coordinate]:
         pass
 
     def _sliding_moves(
-        self, position: Coordinate, board: Board, directions
+        self, square: Coordinate, board: Board, directions
     ) -> list[Coordinate]:
-        row, col = position
+        row, col = square
         moves = []
 
         for dr, dc in directions:
@@ -60,9 +60,9 @@ class Piece(ABC):
         return moves
 
     def _stepping_moves(
-        self, position: Coordinate, board: Board, offsets
+        self, square: Coordinate, board: Board, offsets
     ) -> list[Coordinate]:
-        row, col = position
+        row, col = square
         moves = []
 
         for offset in offsets:
