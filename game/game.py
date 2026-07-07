@@ -105,40 +105,24 @@ class Game:
         king = self.board.get(row, king_from_col)
         rook = self.board.get(row, rook_from_col)
 
-        if not isinstance(king, King):
+    def _perform_en_passant(self, from_row: int, from_col: int) -> bool:
+        pawn = self.board.get(from_row, from_col)
+        if self.state.en_passant_square is None or not isinstance(pawn, Pawn):
             return False
 
-        if not isinstance(rook, Rook) or rook.color != king.color:
-            return False
+        en_passant_row, en_passant_col = self.state.en_passant_square
 
-        path_start = min(king_from_col, rook_from_col) + 1
-        path_end = max(king_from_col, rook_from_col)
+        direction = 1 if pawn.color == Color.BLACK else -1
 
-        # Check if king squares are attacked
-        step = 1 if king_to_col > king_from_col else -1
-        for col in range(king_from_col, king_to_col + step, step):
-            print(row, col)
+        for dc in (1, -1):
+            target_col = from_col + dc
+            diagonal_step: Coordinate = (from_row + direction, target_col)
+            if diagonal_step == self.state.en_passant_square:
+                target = self.board.get(from_row, target_col)
+                if isinstance(target, Pawn) and target.color != pawn.color:
+                    self.board.set(from_row, target_col, None)
+                    self.board.move(from_row, from_col, en_passant_row, en_passant_col)
 
-        opposite_color_attacked_squares = {
-            item
-            for sublist in self.legal_moves()[king.color.opposite].values()
-            for item in sublist
-        }
+                return True
 
-        # Check for pieces in the way of castling
-        for col in range(path_start, path_end):
-            if not self.board.is_empty(row, col):
-                return False
-
-            if (row, col) in opposite_color_attacked_squares:
-                return False
-
-        self.board.set(row, king_from_col, None)
-        self.board.set(row, rook_from_col, None)
-        self.board.set(row, king_to_col, king)
-        self.board.set(row, rook_to_col, rook)
-
-        return True
-
-    def next_turn(self) -> None:
-        self.state.toggle_moving_color()
+        return False
