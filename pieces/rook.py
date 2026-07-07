@@ -1,3 +1,5 @@
+from chess_types import Color
+
 from .config import STRAIGHT_DIRECTIONS
 from .piece import Piece
 
@@ -7,7 +9,7 @@ class Rook(Piece):
 
     @property
     def symbol(self):
-        return "R" if self.color == "white" else "r"
+        return "R" if self.color == Color.WHITE else "r"
 
     def moves(self, position, board):
         return self._sliding_moves(position, board, STRAIGHT_DIRECTIONS)

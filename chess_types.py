@@ -1,4 +1,13 @@
-from typing import Literal
+from enum import Enum
 
-type Color = Literal["white", "black"]
+
+class Color(Enum):
+    WHITE = "white"
+    BLACK = "black"
+
+    @property
+    def opposite(self):
+        return Color.BLACK if self is Color.WHITE else Color.WHITE
+
+
 type Coordinate = tuple[int, int]

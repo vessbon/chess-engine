@@ -1,6 +1,6 @@
 from typing import Optional
 
-from chess_types import Coordinate
+from chess_types import Color, Coordinate
 from pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
 
 
@@ -26,12 +26,12 @@ class Board:
         ]
 
         for i in range(self.size):
-            self.set(1, i, Pawn(color="black"))
-            self.set(6, i, Pawn(color="white"))
+            self.set(1, i, Pawn(Color.BLACK))
+            self.set(6, i, Pawn(Color.WHITE))
 
         for i, piece in enumerate(back_rank):
-            self.set(0, i, piece(color="black"))
-            self.set(7, i, piece(color="white"))
+            self.set(0, i, piece(Color.BLACK))
+            self.set(7, i, piece(Color.WHITE))
 
     def reset(self) -> None:
         for r in range(self.size):
@@ -46,20 +46,23 @@ class Board:
         self._validate_coords(row, col)
         self.grid[row][col] = piece
 
+    def get_pieces(self) -> list[Piece]:
+        return [piece for _, piece in self._iter_pieces()]
+
+    def get_piece_locations(self) -> dict[Piece, Coordinate]:
+        return {piece: coord for coord, piece in self._iter_pieces()}
+
     def move(self, from_row: int, from_col: int, to_row: int, to_col: int) -> bool:
+        self._validate_coords(to_col, to_row)
         piece = self.get(from_row, from_col)
         if piece is None:
             return False
 
-        legal_moves = self.legal_moves(from_row, from_col)
-        if (to_row, to_col) in legal_moves:
-            self.set(from_row, from_col, None)
-            self.set(to_row, to_col, piece)
-            return True
+        self.set(from_row, from_col, None)
+        self.set(to_row, to_col, piece)
+        return True
 
-        return False
-
-    def legal_moves(self, row: int, col: int) -> list[Coordinate]:
+    def pseudo_moves(self, row: int, col: int) -> list[Coordinate]:
         self._validate_coords(row, col)
         piece = self.grid[row][col]
 
@@ -91,6 +94,12 @@ class Board:
     def _validate_coords(self, row: int, col: int) -> None:
         if not self.in_bounds(row, col):
             raise IndexError(f"Out of bounds: ({row}, {col})")
+
+    def _iter_pieces(self):
+        for row in range(self.size):
+            for col in range(self.size):
+                if (piece := self.get(row, col)) is not None:
+                    yield (row, col), piece
 
     def __str__(self) -> str:
         rows = []
