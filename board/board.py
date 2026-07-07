@@ -1,6 +1,7 @@
+import builtins
 from typing import Optional
 
-from chess_types import Color, Coordinate
+from chess_types import Color, Coordinate, Move
 from constants import (
     BLACK_HOME_ROW,
     BLACK_PAWN_ROW,
@@ -69,14 +70,14 @@ class Board:
         self.set(to_row, to_col, piece)
         return True
 
-    def pseudo_moves(self, row: int, col: int) -> list[Coordinate]:
+    def pseudo_moves(self, row: int, col: int) -> builtins.set[Move]:
         self._validate_coords(row, col)
         piece = self.grid[row][col]
 
         if piece is None:
-            return []
+            return set()
 
-        moves = []
+        moves = set()
 
         for move_row, move_col in piece.moves((row, col), self):
             if not self.in_bounds(move_row, move_col):
@@ -87,7 +88,7 @@ class Board:
             if isinstance(occupant, King):
                 continue
 
-            moves.append((move_row, move_col))
+            moves.add(Move((row, col), (move_row, move_col)))
 
         return moves
 
