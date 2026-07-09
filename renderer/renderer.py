@@ -20,6 +20,8 @@ ASSETS_PATH = CHESS_ICONS_PATH = os.path.abspath(
 FONTS_PATH = os.path.join(ASSETS_PATH, "fonts")
 CHESS_ICONS_PATH = os.path.join(ASSETS_PATH, "icons")
 
+PIECE_PADDING = 10
+
 
 class Renderer:
     def __init__(self) -> None:
@@ -114,4 +116,6 @@ class Renderer:
 
     def _load_piece(self, path: str, size: int) -> pygame.Surface:
         image = pygame.image.load(path).convert_alpha()
-        return pygame.transform.smoothscale(image, (size - 5, size - 5))
+        return pygame.transform.smoothscale(
+            image, (size - PIECE_PADDING, size - PIECE_PADDING)
+        )
