@@ -62,8 +62,9 @@ class Renderer:
         return surface
 
     def draw_coordinates(self, surface: pygame.Surface):
-        padding = 5
         font_size = 16
+        padding = 5
+
         font = pygame.font.Font(os.path.join(FONTS_PATH, "dejavusans.ttf"), font_size)
         files = "abcdefgh"
 
