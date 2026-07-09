@@ -94,10 +94,18 @@ class Renderer:
                 if piece is None:
                     continue
 
-                surface.blit(
-                    self.pieces[f"{piece.color.value}_{piece.symbol.capitalize()}"],
-                    (col * SQUARE_SIZE, row * SQUARE_SIZE),
+                piece_image = self.pieces[
+                    f"{piece.color.value}_{piece.symbol.capitalize()}"
+                ]
+
+                piece_rect = piece_image.get_rect(
+                    center=(
+                        col * SQUARE_SIZE + SQUARE_SIZE // 2,
+                        row * SQUARE_SIZE + SQUARE_SIZE // 2,
+                    )
                 )
+
+                surface.blit(piece_image, piece_rect)
 
     def _load_pieces(self) -> dict[str, pygame.Surface]:
         pieces = {}
