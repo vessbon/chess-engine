@@ -4,11 +4,10 @@ import pygame
 import pygame.gfxdraw
 
 from board import Board
-from chess_types import Color, Coordinate
+from chess_types import Color, Coordinate, HighlightType
 from constants import (
     BOARD_DIMENSION,
     BOARD_SIZE,
-    CAPTURE_RGB,
     PIECE_PADDING,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
@@ -42,7 +41,7 @@ class Renderer:
         self.dark_color = (237, 214, 176)
         self.light_color = (184, 135, 98)
 
-        self.highlights: set[Coordinate] = set()
+        self.highlights: dict[Coordinate, HighlightType] = {}
         self.moves: set[Coordinate] = set()
 
         self.player_widget_white = PlayerWidget(
@@ -127,13 +126,26 @@ class Renderer:
         return (row, col)
 
     def highlight_square(self, row: int, col: int) -> None:
-        if not self._in_bounds(row, col):
-            return
+        self._highlight_square(row, col, HighlightType.NORMAL)
 
-        if (row, col) in self.highlights:
-            self.highlights.discard((row, col))
-        else:
-            self.highlights.add((row, col))
+    def highlight_move(
+        self, from_row: int, from_col: int, to_row: int, to_col: int
+    ) -> None:
+        self.clear_highlights(HighlightType.LAST_MOVE)
+
+        self._highlight_square(from_row, from_col, HighlightType.LAST_MOVE)
+        self._highlight_square(to_row, to_col, HighlightType.LAST_MOVE)
+
+    def highlight_selection(self, row: int, col: int):
+        self.clear_highlights(HighlightType.SELECTED)
+        self._highlight_square(row, col, HighlightType.SELECTED)
+
+    def clear_highlights(self, highlight_type: HighlightType) -> None:
+        self.highlights = {
+            coord: htype
+            for coord, htype in self.highlights.items()
+            if htype is not highlight_type
+        }
 
     def set_moves(self, moves: set[Coordinate]) -> None:
         if moves == self.moves:
@@ -191,13 +203,20 @@ class Renderer:
                 surface.blit(piece_image, piece_rect)
 
     def _draw_highlights(self, surface: pygame.Surface) -> None:
-        for row, col in self.highlights:
+        colors = {
+            HighlightType.NORMAL: (255, 0, 0, 80),
+            HighlightType.CAPTURE: (255, 0, 0, 80),
+            HighlightType.LAST_MOVE: (0, 255, 0, 80),
+            HighlightType.SELECTED: (255, 255, 0, 80),
+        }
+
+        for (row, col), highlight_type in self.highlights.items():
             rect = pygame.Rect(
                 col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE
             )
 
             highlight = pygame.Surface(rect.size, pygame.SRCALPHA)
-            highlight.fill((*CAPTURE_RGB, 80))
+            highlight.fill(colors[highlight_type])
 
             surface.blit(highlight, rect)
 
@@ -235,6 +254,31 @@ class Renderer:
         return pygame.transform.smoothscale(
             image, (size - PIECE_PADDING, size - PIECE_PADDING)
         )
+
+    def _highlight_square(
+        self, row: int, col: int, highlight_type: HighlightType
+    ) -> None:
+        if not self._in_bounds(row, col):
+            return
+
+        coord = (row, col)
+        current = self.highlights.get(coord)
+
+        if highlight_type is HighlightType.NORMAL:
+            if current is HighlightType.NORMAL:
+                del self.highlights[coord]
+                return
+
+            if current is not None:
+                return
+
+        self.highlights[coord] = highlight_type
+
+    def _set_highlight(self, row: int, col: int, highlight_type: HighlightType) -> None:
+        if not self._in_bounds(row, col):
+            return
+
+        self.highlights[(row, col)] = highlight_type
 
     def _in_bounds(self, row: int, col: int) -> bool:
         if 0 <= row < BOARD_DIMENSION and 0 <= col <= BOARD_DIMENSION:

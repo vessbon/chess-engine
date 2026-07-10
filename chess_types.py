@@ -25,6 +25,18 @@ class CastlingSide(Enum):
     QUEENSIDE = auto()
 
 
+class HighlightType(Enum):
+    NORMAL = auto()
+    CAPTURE = auto()
+    LAST_MOVE = auto()
+    SELECTED = auto()
+
+
+@dataclass
+class Highlight:
+    highlight_type: HighlightType
+
+
 @dataclass(frozen=True)
 class Move:
     start: Coordinate
