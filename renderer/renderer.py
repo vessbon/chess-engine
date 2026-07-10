@@ -4,7 +4,7 @@ import pygame
 import pygame.gfxdraw
 
 from board import Board
-from chess_types import Color, Coordinate, HighlightType
+from chess_types import Color, Coordinate, HighlightType, Move, MoveType
 from constants import (
     BOARD_DIMENSION,
     BOARD_SIZE,
@@ -15,6 +15,7 @@ from constants import (
     WIDGET_PADDING,
 )
 from game import Game
+from utils import draw_smooth_circle
 
 from .widgets import ClockWidget, PlayerWidget
 
@@ -42,7 +43,7 @@ class Renderer:
         self.light_color = (184, 135, 98)
 
         self.highlights: dict[Coordinate, HighlightType] = {}
-        self.moves: set[Coordinate] = set()
+        self.moves: set[Move] = set()
 
         self.player_widget_white = PlayerWidget(
             (BOARD_LEFT, BOARD_TOP + BOARD_SIZE + WIDGET_PADDING),
@@ -147,7 +148,7 @@ class Renderer:
             if htype is not highlight_type
         }
 
-    def set_moves(self, moves: set[Coordinate]) -> None:
+    def set_moves(self, moves: set[Move]) -> None:
         if moves == self.moves:
             self.moves.clear()
         else:
@@ -221,18 +222,32 @@ class Renderer:
             surface.blit(highlight, rect)
 
     def _draw_moves(self, surface: pygame.Surface) -> None:
-        radius = SQUARE_SIZE // 6
-        cx = SQUARE_SIZE // 2
-        cy = SQUARE_SIZE // 2
+        colors = {
+            MoveType.NORMAL: (0, 0, 0, 100),
+            MoveType.CAPTURE: (255, 0, 0, 150),
+        }
 
-        for row, col in self.moves:
-            move_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            color = (0, 0, 0, 100)
+        dot_radius = SQUARE_SIZE // 6
+        ring_radius = SQUARE_SIZE // 2 - 6
+        ring_width = 4
 
-            pygame.gfxdraw.aacircle(move_surface, cx, cy, radius, color)
-            pygame.gfxdraw.filled_circle(move_surface, cx, cy, radius, color)
+        for move in self.moves:
+            to_row, to_col = move.end
+            cx = to_col * SQUARE_SIZE + SQUARE_SIZE // 2
+            cy = to_row * SQUARE_SIZE + SQUARE_SIZE // 2
 
-            surface.blit(move_surface, (col * SQUARE_SIZE, row * SQUARE_SIZE))
+            if move.move_type in [MoveType.CAPTURE, MoveType.EN_PASSANT]:
+                draw_smooth_circle(
+                    surface,
+                    (cx, cy),
+                    ring_radius,
+                    colors[MoveType.CAPTURE],
+                    width=ring_width,
+                )
+            else:
+                draw_smooth_circle(
+                    surface, (cx, cy), dot_radius, colors[MoveType.NORMAL], width=0
+                )
 
     def _load_pieces(self) -> dict[str, pygame.Surface]:
         pieces = {}
