@@ -9,10 +9,12 @@ class GameState:
         self,
         white_start: bool = True,
         castling_enabled: bool = True,
+        starting_minutes: int = 10,
+        increment_seconds: int = 0,
     ) -> None:
         self.current_color: Color = Color.WHITE if white_start else Color.BLACK
 
-        self.clock = ChessClock(initial_minutes=5, increment_seconds=3)
+        self.clock = ChessClock(starting_minutes, increment_seconds)
 
         self.castling: dict[Color, CastlingRights] = {
             Color.WHITE: CastlingRights(castling_enabled),
