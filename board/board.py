@@ -91,6 +91,9 @@ class Board:
 
         return moves
 
+    def has_piece(self, row: int, col: int) -> bool:
+        return self.in_bounds(row, col) and self.get(row, col) is not None
+
     def is_empty(self, row: int, col: int) -> bool:
         self._validate_coords(row, col)
         return self.grid[row][col] is None
