@@ -13,8 +13,11 @@ from constants import (
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
     SQUARE_SIZE,
+    WIDGET_PADDING,
 )
 from game import Game
+
+from .widgets import ClockWidget, PlayerWidget
 
 ASSETS_PATH = CHESS_ICONS_PATH = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "assets")
@@ -22,6 +25,11 @@ ASSETS_PATH = CHESS_ICONS_PATH = os.path.abspath(
 
 FONTS_PATH = os.path.join(ASSETS_PATH, "fonts")
 CHESS_ICONS_PATH = os.path.join(ASSETS_PATH, "icons")
+
+BOARD_LEFT = SCREEN_WIDTH // 2 - BOARD_SIZE // 2
+BOARD_TOP = SCREEN_HEIGHT // 2 - BOARD_SIZE // 2
+
+FONT_PATH_DEJA_VU_SANS = os.path.join(FONTS_PATH, "dejavusans.ttf")
 
 
 class Renderer:
@@ -37,6 +45,32 @@ class Renderer:
         self.highlights: set[Coordinate] = set()
         self.moves: set[Coordinate] = set()
 
+        self.player_widget_white = PlayerWidget(
+            (BOARD_LEFT, BOARD_TOP + BOARD_SIZE + WIDGET_PADDING),
+            FONT_PATH_DEJA_VU_SANS,
+            Color.WHITE.value.capitalize(),
+            "topleft",
+        )
+        self.clock_white = ClockWidget(
+            (BOARD_LEFT + BOARD_SIZE, BOARD_TOP + BOARD_SIZE + WIDGET_PADDING),
+            FONT_PATH_DEJA_VU_SANS,
+            0,
+            "topright",
+        )
+
+        self.player_widget_black = PlayerWidget(
+            (BOARD_LEFT, BOARD_TOP - WIDGET_PADDING),
+            FONT_PATH_DEJA_VU_SANS,
+            Color.BLACK.value.capitalize(),
+            "bottomleft",
+        )
+        self.clock_black = ClockWidget(
+            (BOARD_LEFT + BOARD_SIZE, BOARD_TOP - WIDGET_PADDING),
+            FONT_PATH_DEJA_VU_SANS,
+            0,
+            "bottomright",
+        )
+
         self.pieces = self._load_pieces()
 
     def draw(self, game: Game) -> None:
@@ -46,10 +80,13 @@ class Renderer:
         self._draw_highlights(surface)
         self._draw_moves(surface)
 
-        self.screen.blit(
-            surface,
-            (SCREEN_WIDTH / 2 - BOARD_SIZE / 2, SCREEN_HEIGHT / 2 - BOARD_SIZE / 2),
-        )
+        self.screen.blit(surface, (BOARD_LEFT, BOARD_TOP))
+
+        self.player_widget_white.draw(self.screen)
+        self.player_widget_black.draw(self.screen)
+
+        self.clock_white.draw(self.screen)
+        self.clock_black.draw(self.screen)
 
         pygame.display.update()
 
@@ -67,6 +104,10 @@ class Renderer:
                 )
 
         return surface
+
+    def update_clock(self, time_white: float, time_black: float):
+        self.clock_white.set_time(time_white)
+        self.clock_black.set_time(time_black)
 
     def mouse_to_square(self, position: tuple[int, int]) -> Coordinate | None:
         x, y = position
@@ -105,7 +146,8 @@ class Renderer:
         font_size = 16
         padding = 5
 
-        font = pygame.font.Font(os.path.join(FONTS_PATH, "dejavusans.ttf"), font_size)
+        font = pygame.font.Font(FONT_PATH_DEJA_VU_SANS, font_size)
+
         files = "abcdefgh"
 
         for square in range(BOARD_DIMENSION):
