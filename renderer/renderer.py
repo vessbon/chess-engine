@@ -128,7 +128,7 @@ class Renderer:
                 ),
             )
 
-    def draw_pieces(self, surface: pygame.Surface, board: Board) -> None:
+    def _draw_pieces(self, surface: pygame.Surface, board: Board) -> None:
         for row in range(BOARD_DIMENSION):
             for col in range(BOARD_DIMENSION):
                 piece = board.get(row, col)
@@ -147,6 +147,31 @@ class Renderer:
                 )
 
                 surface.blit(piece_image, piece_rect)
+
+    def _draw_highlights(self, surface: pygame.Surface) -> None:
+        for row, col in self.highlights:
+            rect = pygame.Rect(
+                col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE
+            )
+
+            highlight = pygame.Surface(rect.size, pygame.SRCALPHA)
+            highlight.fill((*CAPTURE_RGB, 80))
+
+            surface.blit(highlight, rect)
+
+    def _draw_moves(self, surface: pygame.Surface) -> None:
+        radius = SQUARE_SIZE // 6
+        cx = SQUARE_SIZE // 2
+        cy = SQUARE_SIZE // 2
+
+        for row, col in self.moves:
+            move_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
+            color = (0, 0, 0, 100)
+
+            pygame.gfxdraw.aacircle(move_surface, cx, cy, radius, color)
+            pygame.gfxdraw.filled_circle(move_surface, cx, cy, radius, color)
+
+            surface.blit(move_surface, (col * SQUARE_SIZE, row * SQUARE_SIZE))
 
     def _load_pieces(self) -> dict[str, pygame.Surface]:
         pieces = {}
@@ -168,3 +193,8 @@ class Renderer:
         return pygame.transform.smoothscale(
             image, (size - PIECE_PADDING, size - PIECE_PADDING)
         )
+
+    def _in_bounds(self, row: int, col: int) -> bool:
+        if 0 <= row < BOARD_DIMENSION and 0 <= col <= BOARD_DIMENSION:
+            return True
+        return False
