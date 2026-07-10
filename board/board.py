@@ -1,6 +1,6 @@
 import builtins
 
-from chess_types import Color, Coordinate, Move
+from chess_types import Color, Coordinate, Move, MoveType
 from constants import (
     BLACK_HOME_ROW,
     BLACK_PAWN_ROW,
@@ -87,7 +87,9 @@ class Board:
             if isinstance(occupant, King):
                 continue
 
-            moves.add(Move((row, col), (move_row, move_col)))
+            move_type = MoveType.CAPTURE if occupant is not None else MoveType.NORMAL
+
+            moves.add(Move((row, col), (move_row, move_col), move_type))
 
         return moves
 

@@ -15,6 +15,7 @@ class Color(Enum):
 
 class MoveType(Enum):
     NORMAL = auto()
+    CAPTURE = auto()
     CASTLE = auto()
     EN_PASSANT = auto()
     PROMOTION = auto()
