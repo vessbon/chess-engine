@@ -44,3 +44,19 @@ class GameController:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                square = self.renderer.mouse_to_square(pygame.mouse.get_pos())
+                if square is None:
+                    continue
+
+                row, col = square
+
+                if event.button == pygame.BUTTON_LEFT:
+                    legal_moves = self.game.legal_moves_from_square(row, col)
+                    legal_end_coordinates = {move.end for move in legal_moves}
+
+                    self.renderer.set_moves(legal_end_coordinates)
+
+                elif event.button == pygame.BUTTON_RIGHT:
+                    self.renderer.highlight_square(row, col)
