@@ -1,8 +1,9 @@
 from chess_types import Color
+from utils import get_time_string
 
 
 class ChessClock:
-    def __init__(self, initial_minutes: int = 5, increment_seconds: int = 0) -> None:
+    def __init__(self, initial_minutes: int = 10, increment_seconds: int = 0) -> None:
         self.times = {
             Color.WHITE: float(initial_minutes * 60),
             Color.BLACK: float(initial_minutes * 60),
@@ -26,13 +27,4 @@ class ChessClock:
     def get_time_string(self, color: Color) -> str:
         """Formats the internal float seconds into a clean UI string."""
         total_seconds = self.times[color]
-
-        minutes = int(total_seconds // 60)
-        seconds = int(total_seconds % 60)
-
-        tenths = int((total_seconds % 1) * 10)
-
-        if total_seconds < 10 and total_seconds > 0:
-            return f"{seconds:02d}.{tenths}"
-
-        return f"{minutes:02d}:{seconds:02d}"
+        return get_time_string(total_seconds)

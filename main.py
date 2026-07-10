@@ -5,7 +5,7 @@ from renderer import Renderer
 
 def main():
     board = Board()
-    game_state = GameState()
+    game_state = GameState(starting_minutes=15, increment_seconds=3)
 
     game = Game(board, game_state)
     renderer = Renderer()

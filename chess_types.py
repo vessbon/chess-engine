@@ -15,6 +15,7 @@ class Color(Enum):
 
 class MoveType(Enum):
     NORMAL = auto()
+    CAPTURE = auto()
     CASTLE = auto()
     EN_PASSANT = auto()
     PROMOTION = auto()
@@ -23,6 +24,18 @@ class MoveType(Enum):
 class CastlingSide(Enum):
     KINGSIDE = auto()
     QUEENSIDE = auto()
+
+
+class HighlightType(Enum):
+    NORMAL = auto()
+    CAPTURE = auto()
+    LAST_MOVE = auto()
+    SELECTED = auto()
+
+
+@dataclass
+class Highlight:
+    highlight_type: HighlightType
 
 
 @dataclass(frozen=True)
