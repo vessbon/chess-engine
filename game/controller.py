@@ -1,6 +1,6 @@
 import pygame
 
-from chess_types import Coordinate
+from chess_types import Color, Coordinate
 from game import Game
 from renderer import Renderer
 
@@ -40,6 +40,11 @@ class GameController:
             return
 
     def draw(self) -> None:
+        self.renderer.update_clock(
+            self.game.state.clock.times[Color.WHITE],
+            self.game.state.clock.times[Color.BLACK],
+        )
+
         self.renderer.draw(self.game)
 
     def handle_events(self) -> None:
