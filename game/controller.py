@@ -118,7 +118,7 @@ class GameController:
 
     def _render_legal_destinations(self, row: int, col: int) -> None:
         legal_moves = self.game.legal_moves_from_square(row, col)
-        self.renderer.set_moves({move.end for move in legal_moves})
+        self.renderer.set_moves({move for move in legal_moves})
 
     def _render_selection_square(self, row: int, col: int) -> None:
         self._render_legal_destinations(row, col)
