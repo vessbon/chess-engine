@@ -281,6 +281,6 @@ class Renderer:
         self.highlights[(row, col)] = highlight_type
 
     def _in_bounds(self, row: int, col: int) -> bool:
-        if 0 <= row < BOARD_DIMENSION and 0 <= col <= BOARD_DIMENSION:
+        if 0 <= row < BOARD_DIMENSION and 0 <= col < BOARD_DIMENSION:
             return True
         return False
