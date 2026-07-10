@@ -1,12 +1,15 @@
 import os
 
 import pygame
+import pygame.gfxdraw
 
 from board import Board
-from chess_types import Color
+from chess_types import Color, Coordinate
 from constants import (
     BOARD_DIMENSION,
     BOARD_SIZE,
+    CAPTURE_RGB,
+    PIECE_PADDING,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
     SQUARE_SIZE,
@@ -20,8 +23,6 @@ ASSETS_PATH = CHESS_ICONS_PATH = os.path.abspath(
 FONTS_PATH = os.path.join(ASSETS_PATH, "fonts")
 CHESS_ICONS_PATH = os.path.join(ASSETS_PATH, "icons")
 
-PIECE_PADDING = 10
-
 
 class Renderer:
     def __init__(self) -> None:
@@ -32,12 +33,18 @@ class Renderer:
 
         self.dark_color = (237, 214, 176)
         self.light_color = (184, 135, 98)
+
+        self.highlights: set[Coordinate] = set()
+        self.moves: set[Coordinate] = set()
+
         self.pieces = self._load_pieces()
 
     def draw(self, game: Game) -> None:
         surface = self.draw_board()
-        self.draw_pieces(surface, game.board)
-        self.draw_coordinates(surface)
+        self._draw_pieces(surface, game.board)
+        self._draw_coordinates(surface)
+        self._draw_highlights(surface)
+        self._draw_moves(surface)
 
         self.screen.blit(
             surface,
@@ -61,7 +68,40 @@ class Renderer:
 
         return surface
 
-    def draw_coordinates(self, surface: pygame.Surface):
+    def mouse_to_square(self, position: tuple[int, int]) -> Coordinate | None:
+        x, y = position
+
+        board_x = SCREEN_WIDTH // 2 - BOARD_SIZE // 2
+        board_y = SCREEN_HEIGHT // 2 - BOARD_SIZE // 2
+
+        x -= board_x
+        y -= board_y
+
+        row = y // SQUARE_SIZE
+        col = x // SQUARE_SIZE
+
+        if not self._in_bounds(row, col):
+            return
+
+        return (row, col)
+
+    def highlight_square(self, row: int, col: int) -> None:
+        if not self._in_bounds(row, col):
+            return
+
+        if (row, col) in self.highlights:
+            self.highlights.discard((row, col))
+        else:
+            self.highlights.add((row, col))
+
+    def set_moves(self, moves: set[Coordinate]) -> None:
+        if moves == self.moves:
+            self.moves.clear()
+        else:
+            self.moves.clear()
+            self.moves.update(moves)
+
+    def _draw_coordinates(self, surface: pygame.Surface):
         font_size = 16
         padding = 5
 
